@@ -2,7 +2,7 @@ from ecircuit import *
 
 if __name__ == "__main__":
     circuit = ECircuit()
-    circuit.enterTable()
+    circuit.entewddeTable()
 
     circuit.build()
     circuit.resizeMatrix()

@@ -8,8 +8,10 @@ def entaerTable():
         elif text == 'exit':
             if len(items) == 0:
                 print("Таблица пустая!")
-            else: break
-        else: print("Для завершения ввода нажмите 'exit'")
+            else:
+                break
+        else:
+            print("Для завершения ввода нажмите 'exit'")
     return items
 
 def moveMatrix(startRow, matrix):
@@ -21,13 +23,8 @@ def moveMatrix(startRow, matrix):
     return matrix
 
 def printM(matrix):
-    for i in range(len(matrix)):
-        row = []
-        for j in range(len(matrix)):
-            row.append(matrix[i][j])
-        while  len(row) != 0 and row[-1] == "  ":
-            row.pop(-1)
-        print(str(row))
+    for row in matrix:
+        print("".join(row))
 
 def addingLines(matrix):
     for i in range(len(matrix)):    # добавляем горизонтальные линии
@@ -45,9 +42,16 @@ def addingLines(matrix):
     return matrix
 
 def resizeMatrix(matrix):
+    for index in range(len(matrix)):
+        while len(matrix[index]) != 0 and matrix[index][-1] == "  ":
+            matrix[index].pop(-1)
+    newMatrix = []
     for row in matrix:
-        while len(row) != 0 and row[-1] == "  ":
-            row.pop(-1)
+        if row != []:
+            newMatrix.append(row)
+    matrix = newMatrix
+    return matrix
+
 
 def elementSearch(searchingElement, items, foundedItems, matrix, mI, mJ):
     if searchingElement == 'E':                                 # Если элемент указывает на конец то пишем конец
@@ -71,6 +75,7 @@ def elementSearch(searchingElement, items, foundedItems, matrix, mI, mJ):
                         matrix = moveMatrix(mI + 1, matrix)     # двигаем матрицу вниз без текущей строки
                         matrix[mI + 1][mJ] = "└─"               # добавляем уголок и идем далее по ложной ветке
                         mI, matrix = elementSearch(items[index][2], items, foundedItems.copy(), matrix, mI + 1, mJ + 1)
+                break
     return mI, matrix
 
 if __name__ == "__main__":
@@ -79,6 +84,6 @@ if __name__ == "__main__":
     matrix = [["  "] * len(inputItems)*16 for i in range(len(inputItems)*16)]
     mI, matrix = elementSearch('S', inputItems, foundedItems, matrix, 0, 0)
     matrix = addingLines(matrix)
-    resizeMatrix(matrix)
+    matrix = resizeMatrix(matrix)
     printM(matrix)
     key = input()

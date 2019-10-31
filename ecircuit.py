@@ -50,6 +50,7 @@ class ECircuit():
                             self.moveMatrix(mI + 1)  # двигаем матрицу вниз без текущей строки
                             self.matrix[mI + 1][mJ] = "└"  # добавляем уголок и идем далее по ложной ветке
                             mI = self.elementSearch(items[index][2], items, foundedItems.copy(), mI + 1, mJ + 1)
+                    break
         return mI
 
     def addingLines(self):  # добавление связующих вертиакальных линий
