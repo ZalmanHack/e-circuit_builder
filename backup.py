@@ -21,8 +21,13 @@ def moveMatrix(startRow, matrix):
     return matrix
 
 def printM(matrix):
-    for row in matrix:
-        print("".join(row))
+    for i in range(len(matrix)):
+        row = []
+        for j in range(len(matrix)):
+            row.append(matrix[i][j])
+        while  len(row) != 0 and row[-1] == "  ":
+            row.pop(-1)
+        print(str(row))
 
 def addingLines(matrix):
     for i in range(len(matrix)):    # добавляем горизонтальные линии
@@ -40,18 +45,9 @@ def addingLines(matrix):
     return matrix
 
 def resizeMatrix(matrix):
-    print(len(matrix))
-    for index in range(len(matrix)):
-        while len(matrix[index]) != 0 and matrix[index][-1] == "  ":
-            matrix[index].pop(-1)
-    newMatrix = []
     for row in matrix:
-        if row != []:
-            newMatrix.append(row)
-    matrix = newMatrix
-    print(len(matrix))
-    return matrix
-
+        while len(row) != 0 and row[-1] == "  ":
+            row.pop(-1)
 
 def elementSearch(searchingElement, items, foundedItems, matrix, mI, mJ):
     if searchingElement == 'E':                                 # Если элемент указывает на конец то пишем конец
@@ -83,6 +79,6 @@ if __name__ == "__main__":
     matrix = [["  "] * len(inputItems)*16 for i in range(len(inputItems)*16)]
     mI, matrix = elementSearch('S', inputItems, foundedItems, matrix, 0, 0)
     matrix = addingLines(matrix)
-    matrix = resizeMatrix(matrix)
+    resizeMatrix(matrix)
     printM(matrix)
     key = input()

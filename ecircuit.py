@@ -16,7 +16,7 @@ class ECircuit():
     def show(self): # отображение Е-схемы на экране
         for i in range(len(self.matrix)):
             str = ""
-            for j in range(len(self.matrix)):
+            for j in range(len(self.matrix[i])):
                 if self.matrix[i][j] in ["│",""]:
                     space = " " * (self.itemLen - len(self.matrix[i][j]))
                     str += space + self.matrix[i][j]
@@ -75,6 +75,7 @@ class ECircuit():
                     self.startIsValid = True
                     return True
                 else:
+                    self.startIsValid = False
                     return False
             elif item[0] == "END":
                 return False
@@ -120,28 +121,12 @@ class ECircuit():
         for j in range(len(self.matrix)):
             self.matrix[startRow][j] = ""
 
-"""
-    def minimize(self, searchingElement, items, foundedItems, qw, mJ): # рекурсивный спуск по дереву
-        if searchingElement == 'END':  # Если элемент указывает на конец то пишем конец
-            self.matrix[mI][mJ] = 'END'
-        else:
-            for index in range(len(items)):  # перебор введенных смежностей
-                if searchingElement == items[index][0]:  # если нашли такой
-                    if index in foundedItems:  # и если он уже вызывался в ветке
-                        self.matrix[mI][mJ] = searchingElement  # добавляем в матрицу
-                    else:  # иначе
-                        foundedItems.append(index)  # помечаем как найденный
-                        if items[index][-1] == '0':  # проверяем на тип "функциональный"
-                            self.matrix[mI][mJ] = searchingElement  # если да, то отображаем и идем по ветке далее
-                            mI = self.elementSearch(items[index][1], items, foundedItems.copy(), mI, mJ + 1)
-                        else:  # иначе он является предикатным
-                            self.matrix[mI][mJ] = searchingElement  # отображаем в матрице
-                            self.moveMatrix(mI)  # перемещаем текущую и нижние строки на 1 вниз
-                            self.matrix[mI][mJ] = "┌"  # добавляем уголок и идем далее по правдивой ветке
-                            mI = self.elementSearch(items[index][1], items, foundedItems.copy(), mI, mJ + 1)
-                            mI += 1  # становимся на центр предиката
-                            self.moveMatrix(mI + 1)  # двигаем матрицу вниз без текущей строки
-                            self.matrix[mI + 1][mJ] = "└"  # добавляем уголок и идем далее по ложной ветке
-                            mI = self.elementSearch(items[index][2], items, foundedItems.copy(), mI + 1, mJ + 1)
-        return mI
-"""
+    def resizeMatrix(self):
+        for index in range(len(self.matrix)):
+            while len(self.matrix[index]) != 0 and self.matrix[index][-1] == "":
+                self.matrix[index].pop(-1)
+        newMatrix = []
+        for row in self.matrix:
+            if row != []:
+                newMatrix.append(row)
+        self.matrix = newMatrix
