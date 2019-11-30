@@ -46,9 +46,9 @@ class ECircuit():
         painter.setTextSetting(self.builder.getItemLen(), 10)
         painter.draw()
 
-    def build(self):
+    def build(self, add_knots: bool = True):
         self.builder.setTable(self.items)
-        self.builder.build()
+        self.builder.build(add_knots)
         self.items = self.builder.getTable()
         self.matrix = self.builder.getMatrix()
         self.itemLen = self.builder.getItemLen()

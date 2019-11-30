@@ -10,12 +10,16 @@ def console():
     circuit.build()
     circuit.show()
     table = circuit.getTable()
+    for i in table:
+        print(i)
+    print("-----------------")
     circuit.minimize()
     table = circuit.getTable()
     for i in table:
         print(i)
+    print("-----------------")
     circuit.setTable(table)
-    circuit.build()
+    circuit.build(add_knots=False)
     circuit.show()
 
 
