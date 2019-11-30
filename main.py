@@ -32,7 +32,8 @@ def consoleWithGraphics():
 
 if __name__ == "__main__":
 
-
+    j = [0,1,2,3]
+    print(j[2:-1])
 
     if len(sys.argv) == 1:
         print("---------- Консольный режим ----------")
