@@ -1,75 +1,67 @@
+from ecircuit_bould import *
+from ecircuit_draw import *
+from ecircuit_minimize import *
+
+class Mode:
+    graphic = 1
+    console = 2
+
+
 class ECircuit():
-    def __init__(self):
+    def __init__(self, mode: Mode = Mode.console):
+        self.mode = mode
+        self.builder = ECircuit_Build()
+        self.minimizer = ECircuit_Minimize()
+
         self.items = []
         self.matrix = []
         self.itemLen = 6
-        self.startIsValid = False # проверка на существование блока старт в таблице (items)
-
-    def getMatrix(self):
-        return self.matrix
-
-    def build(self): # построение Е-схемы
-        self.matrix = [[""] * len(self.items) * 15 for i in range(len(self.items) * 15)]
-        self.elementSearch('START', self.items, [], 0, 0)
-        self.addingLines()
+        self.startIsValid = False  # проверка на существование блока старт в таблице (items)
 
     def show(self): # отображение Е-схемы на экране
-        for i in range(len(self.matrix)):
+        if self.mode == Mode.graphic:
+            self._graphic_show()
+        if self.mode == Mode.console:
+            self._console_show()
+
+    def _console_show(self):
+        matrix = self.builder.getMatrix()
+        for i in range(len(self.builder.getMatrix())):
             str = ""
-            for j in range(len(self.matrix[i])):
-                if self.matrix[i][j] in ["│",""]:
-                    space = " " * (self.itemLen - len(self.matrix[i][j]))
-                    str += space + self.matrix[i][j]
-                elif self.matrix[i][j] in ["└","┌"]:
-                    space = " " * (self.itemLen - len(self.matrix[i][j]))
-                    str += space + self.matrix[i][j]
+            for j in range(len(matrix[i])):
+                if matrix[i][j] in ["│",""]:
+                    space = " " * (self.builder.itemLen - len(matrix[i][j]))
+                    str += space + matrix[i][j]
+                elif matrix[i][j] in ["└","┌"]:
+                    space = " " * (self.builder.itemLen - len(matrix[i][j]))
+                    str += space + matrix[i][j]
                 else:
-                    space = "─" * (self.itemLen - len(self.matrix[i][j]))
-                    str += space + self.matrix[i][j]
+                    space = "─" * (self.builder.itemLen - len(matrix[i][j]))
+                    str += space + matrix[i][j]
             print(str)
 
-    def elementSearch(self, searchingElement, items, foundedItems, mI, mJ): # рекурсивный спуск по дереву
-        if searchingElement == 'END':  # Если элемент указывает на конец то пишем конец
-            self.matrix[mI][mJ] = 'END'
-        else:
-            for index in range(len(items)):  # перебор введенных смежностей
-                if searchingElement == items[index][0]:  # если нашли такой
-                    if index in foundedItems:  # и если он уже вызывался в ветке
-                        self.matrix[mI][mJ] = searchingElement  # добавляем в матрицу
-                    else:  # иначе
-                        foundedItems.append(index)  # помечаем как найденный
-                        if items[index][-1] == '0':  # проверяем на тип "функциональный"
-                            self.matrix[mI][mJ] = searchingElement  # если да, то отображаем и идем по ветке далее
-                            mI = self.elementSearch(items[index][1], items, foundedItems.copy(), mI, mJ + 1)
-                        else:  # иначе он является предикатным
-                            self.matrix[mI][mJ] = searchingElement  # отображаем в матрице
-                            self.moveMatrix(mI)  # перемещаем текущую и нижние строки на 1 вниз
-                            self.matrix[mI][mJ] = "┌"  # добавляем уголок и идем далее по правдивой ветке
-                            mI = self.elementSearch(items[index][1], items, foundedItems.copy(), mI, mJ + 1)
-                            mI += 1  # становимся на центр предиката
-                            self.moveMatrix(mI + 1)  # двигаем матрицу вниз без текущей строки
-                            self.matrix[mI + 1][mJ] = "└"  # добавляем уголок и идем далее по ложной ветке
-                            mI = self.elementSearch(items[index][2], items, foundedItems.copy(), mI + 1, mJ + 1)
-                    break
-        return mI
+    def _graphic_show(self):
+        painter = ECircuit_Draw()
+        painter.setMatrix(self.builder.getMatrix())
+        painter.setTextSetting(self.builder.getItemLen(), 10)
+        painter.draw()
 
-    def addingLines(self):  # добавление связующих вертиакальных линий
-        for i in range(len(self.matrix)):  # добавляем горизонтальные линии
-            for j in range(len(self.matrix)):
-                if self.matrix[i][j] == "└":
-                    for k in range(i - 1, 0 - 1, -1):
-                        if self.matrix[k][j] == "│" or self.matrix[k][j] == "":
-                            self.matrix[k][j] = "│"
-                        else:
-                            break
-                elif self.matrix[i][j] == "┌":
-                    for k in range(i + 1, len(self.matrix), 1):
-                        if self.matrix[k][j] == "│" or self.matrix[k][j] == "":
-                            self.matrix[k][j] = "│"
-                        else:
-                            break
+    def build(self):
+        self.builder.setTable(self.items)
+        self.builder.build()
+        self.items = self.builder.getTable()
+        self.matrix = self.builder.getMatrix()
+        self.itemLen = self.builder.getItemLen()
 
-    def itemIsValid(self, item):    # проверка корректности строки из таблицы смежности
+    def minimize(self):
+        self.minimizer.setTable(self.items)
+        self.minimizer.build()
+        self.items = self.minimizer.getTable()
+
+    def getTable(self):
+        return self.items
+
+    def itemIsValid(self, item):  # проверка корректности строки из таблицы смежности
         if len(item) == 3:
             if item[0] == "START":
                 if not self.startIsValid:
@@ -89,17 +81,10 @@ class ECircuit():
         else:
             return False
 
-    def setTable(self, newItems): # задам таблицу смежности из готового списка
-        self.__init__()
-        for item in newItems:
-            if self.itemIsValid(item):
-                self.items.append(item)
-
-    def getTable(self):
-        return self.items
-
     def enterTable(self):   # ввод таблиц смежности с клавиатуры
-        self.__init__()
+        self.items = []
+        self.itemLen = 6
+        self.startIsValid = False  # проверка на существование блока старт в таблице (items)
         print("Введите матрицу смежности\nДля завершения ввода нажмите 'exit'")
         while True:
             item = input().upper().split(',')
@@ -115,19 +100,11 @@ class ECircuit():
             else:
                 print("Для завершения ввода нажмите 'exit'")
 
-    def moveMatrix(self, startRow): # сдвиг части матрицы вниз
-        for i in range(len(self.matrix[0]) - 2, startRow - 1, -1):
-            for j in range(len(self.matrix)):
-                self.matrix[i + 1][j] = self.matrix[i][j]
-        for j in range(len(self.matrix)):
-            self.matrix[startRow][j] = ""
-
-    def resizeMatrix(self):
-        for index in range(len(self.matrix)):
-            while len(self.matrix[index]) != 0 and self.matrix[index][-1] == "":
-                self.matrix[index].pop(-1)
-        newMatrix = []
-        for row in self.matrix:
-            if row != []:
-                newMatrix.append(row)
-        self.matrix = newMatrix
+    def setTable(self, newItems): # задам таблицу смежности из готового списка
+        self.items = []
+        self.matrix = []
+        self.itemLen = 6
+        self.startIsValid = False  # проверка на существование блока старт в таблице (items)
+        for item in newItems:
+            if self.itemIsValid(item):
+                self.items.append(item)
