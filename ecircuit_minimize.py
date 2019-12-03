@@ -108,6 +108,8 @@ class ECircuit_Minimize():
             foundItems = ["0"]
         for index in range(len(self.items)):  # перебор введенных смежностей
             if searchingElement == self.items[index][0]:  # если нашли такой
+                reserve_2_foundItems = foundItems.copy() # для возврата по условию ненужной строки
+                reserve_2_foundRows = foundRows.copy()
                 old_size_found_items = len(foundItems)
                 foundItems = self.union(foundItems, self.items[index])
                 for max_quantity, template in templates:  # перебор шаблонов
@@ -115,21 +117,24 @@ class ECircuit_Minimize():
                         temp_row = self._convert_row_indexes(template_row, foundItems)
                         if len(temp_row) > 0 and self.items[index][0] == temp_row[0]:  # если первые стобцы строк соовпали
                             if self.items[index] == temp_row:  # если строка шаблона совпала с искомой
+                                if index not in foundRows:
+                                    foundRows.append(index)
+                                if len(template) <= 1:  # если последняя строка в шаблоне
+                                    reserve_foundItems = foundItems.copy()
+                                    reserve_foundRows = foundRows.copy()
                                 temp = template.copy()
                                 temp.remove(template_row)
                                 correct_templates.append([max_quantity, temp])
-                                if index not in foundRows:
-                                    foundRows.append(index)
-                                if len(template) == 1:  # если последняя строка в шаблоне
-                                    reserve_foundItems = foundItems.copy()
-                                    reserve_foundRows = foundRows.copy()
                                 break
                         else:
                             item_is_bigger = True
                 if len(correct_templates) == 0:
-                    if old_size_found_items != len(foundItems):
+                    if not item_is_bigger:
                         foundRows.clear()
                         foundItems.clear()
+                    else:
+                        #items_is_template = True
+                        return [reserve_2_foundRows, reserve_2_foundItems, items_is_template]
                 else:
                     if self._knot_in(searchingElement,foundItems):
                         foundRows.clear()
@@ -138,6 +143,7 @@ class ECircuit_Minimize():
                         # Продолжаем проход по ветке
                         if self.items[index][-1] == '0':  # проверяем на тип "функциональный"
                             foundRows, foundItems, items_is_template = self._template_Search(self.items[index][1], foundItems, foundRows.copy(), correct_templates.copy())
+
                         else:  # иначе он является предикатным
                             foundRows, foundItems, items_is_template = self._template_Search(self.items[index][1], foundItems, foundRows.copy(),correct_templates.copy())
                             if len(foundRows) > 0:
@@ -147,10 +153,12 @@ class ECircuit_Minimize():
                             if len(reserve_foundRows) > 0:  # если есть резерв (более простые шаблоны)
                                 items_is_template = True
                                 return [reserve_foundRows, reserve_foundItems, items_is_template]
+                            """
                             else:
                                 items_is_template = False
                                 foundRows.clear()
                                 foundItems.clear()
+                            """
                     return [foundRows, foundItems, items_is_template]
         return [foundRows, foundItems, items_is_template]
 
