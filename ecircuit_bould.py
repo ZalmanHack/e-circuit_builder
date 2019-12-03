@@ -162,8 +162,7 @@ class ECircuit_Build():
 
     def build(self, add_knots: bool = True):  # построение Е-схемы
         self.matrix = [[""] * len(self.items) * 15 for i in range(len(self.items) * 15)]
-        if add_knots:
-            self._create_knots("START", [])
+        self._create_knots("START", [])
         self._elementSearch('START', [], 0, 0)
         self._addingLines()
         self._resizeMatrix()

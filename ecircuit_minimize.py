@@ -17,7 +17,6 @@ class ECircuit_Minimize():
                 for i in item:
                     res.append([self._max_in_matrix(i), i])
             self.template = res
-            print("_load_templates:: good")
 
     def _convert_row_indexes(self, row: list, foundItems: list):
         try:
@@ -54,7 +53,7 @@ class ECircuit_Minimize():
             new_item = "{0}.{1}/{2}".format(iteration, self.elemen_minimize, len(foundRows))
             self.elemen_minimize += 1
             # self.items[index][column] = new_item
-            print(foundItems)
+            # print(foundItems)
             is_knot = self._is_knot(self.items[foundRows[0]][0])
             if is_knot:
 
@@ -74,6 +73,7 @@ class ECircuit_Minimize():
             else:
                 return new_item
         return self.items[index][column]
+
 
     def _elementSearch(self, searchingElement, foundItems, iteration):  # рекурсивный спуск по дереву
         changed = False
@@ -96,6 +96,7 @@ class ECircuit_Minimize():
                             searchingElement = self._update_element(items_is_template, index, 2, foundRows,foundedElements, iteration, searchingElement)
                             self._elementSearch(searchingElement, foundItems.copy(), iteration)
                     break
+
 
     def _template_Search(self, searchingElement: str, foundItems: list, foundRows: list, templates):
         items_is_template = False  # найден шаблон
@@ -153,22 +154,50 @@ class ECircuit_Minimize():
                     return [foundRows, foundItems, items_is_template]
         return [foundRows, foundItems, items_is_template]
 
-    def deleting_unnecessary_nodes(self, searchingElement, foundedItems):
+    def deleting_unnecessary_nodes(self, searchingElement, foundItems):
+        nodes = []
+        to_delete = []
         if searchingElement == 'END':  # Если элемент указывает на конец то пишем конец
             pass
         else:
             for index in range(len(self.items)):  # перебор введенных смежностей
                 if searchingElement == self.items[index][0]:  # если нашли такой
-                    if index in foundedItems:  # и если он уже вызывался в ветке
-                        pass
+                    if index in foundItems:  # и если он уже вызывался в ветке
+                        if self._is_knot(searchingElement):
+                            nodes.append(searchingElement)
                     else:  # иначе
-                        foundedItems.append(index)  # помечаем как найденный
+                        foundItems.append(index)  # помечаем как найденный
                         if self.items[index][-1] == '0':  # проверяем на тип "функциональный"
-                            elements = self.deleting_unnecessary_nodes(self.items[index][1], foundedItems.copy())
+                            temp_nodes, temp_to_delete = self.deleting_unnecessary_nodes(self.items[index][1], foundItems.copy())
+                            for node in temp_nodes:
+                                if node not in nodes:
+                                    nodes.append(node)
+                            for i in temp_to_delete:
+                                    to_delete.append(i)
                         else:  # иначе он является предикатным
-                            self.deleting_unnecessary_nodes(self.items[index][1], foundedItems.copy())
-                            self.deleting_unnecessary_nodes(self.items[index][2], foundedItems.copy())
-                    break
+                            temp_nodes, temp_to_delete = self.deleting_unnecessary_nodes(self.items[index][1], foundItems.copy())
+                            for node in temp_nodes:
+                                if node not in nodes:
+                                    nodes.append(node)
+                            for i in temp_to_delete:
+                                    to_delete.append(i)
+                            temp_nodes, temp_to_delete = self.deleting_unnecessary_nodes(self.items[index][2], foundItems.copy())
+                            for node in temp_nodes:
+                                if node not in nodes:
+                                    nodes.append(node)
+                            for i in temp_to_delete:
+                                    to_delete.append(i)
+                        print(nodes)
+                        if len(foundItems) > 1 and self._is_knot(searchingElement) and searchingElement not in nodes:
+                            print(self.items[foundItems[-2]], "->", self.items[foundItems[-1]])
+
+                            for i in range(0, len(self.items[foundItems[-2]])):
+                                if self.items[foundItems[-2]][i] == searchingElement:
+                                    self.items[foundItems[-2]][i] = self.items[foundItems[-1]][1]
+                                    to_delete.append(index)
+                                    break
+
+        return nodes, to_delete
 
     def itemIsValid(self, item):  # проверка корректности строки из таблицы смежности
         if len(item) == 3:
@@ -205,6 +234,10 @@ class ECircuit_Minimize():
         for _ in range(10):
             table_size = len(self.items)
             self._elementSearch("START", [], iterations)
+            nodes, items_to_delete = self.deleting_unnecessary_nodes("START",[])
+            items_to_delete.sort(reverse=True)
+            for item in items_to_delete:
+                self.items.pop(item)
             if table_size == len(self.items):
                 return
             self.elemen_minimize = 1
@@ -213,3 +246,27 @@ class ECircuit_Minimize():
     def getTable(self):
         return self.items
 
+
+    def enterTable(self):   # ввод таблиц смежности с клавиатуры
+        self.items = []
+        self.itemLen = 6
+        self.startIsValid = False  # проверка на существование блока старт в таблице (items)
+        print("Введите матрицу смежности\nДля завершения ввода нажмите 'exit'")
+        while True:
+            item = input().upper().split(',')
+            if self.itemIsValid(item):
+                self.items.append(item)
+            elif item == ['EXIT']:
+                if len(self.items) == 0:
+                    print("Таблица пустая!")
+                elif not self.startIsValid:
+                    print("Не найден блок START!")
+                else:
+                    break
+            else:
+                print("Для завершения ввода нажмите 'exit'")
+
+if __name__ == "__main__":
+    test = ECircuit_Minimize()
+    test.enterTable()
+    print(test.deleting_unnecessary_nodes("START",[]))

@@ -1,13 +1,17 @@
+import sys
+import os
+
 from ecircuit_bould import *
 from ecircuit_draw import *
 from ecircuit_minimize import *
+
 
 class Mode:
     graphic = 1
     console = 2
 
 
-class ECircuit():
+class ECircuit:
     def __init__(self, mode: Mode = Mode.console):
         self.mode = mode
         self.builder = ECircuit_Build()
@@ -18,11 +22,27 @@ class ECircuit():
         self.itemLen = 6
         self.startIsValid = False  # проверка на существование блока старт в таблице (items)
 
+        self.menu_items = [
+            ["| Ввод таблицы смежности        |", [self.enterTable]],
+            ["| Генерировать Е-Схему          |", [self.build, self.show]],
+            ["| Минимизировать Е-Схему        |", [self.build, self.minimize, self.build, self.show]],
+            ["| Отобразить таблицу смежности  |", [self.show_items]],
+            ["| Выйти из программы            |", [self.get_quit]]
+        ]
+
+    def get_quit(self):
+        sys.exit(0)
+
     def show(self): # отображение Е-схемы на экране
         if self.mode == Mode.graphic:
             self._graphic_show()
         if self.mode == Mode.console:
             self._console_show()
+
+    def show_items(self):
+        for item in self.items:
+            print(",".join(item))
+
 
     def _console_show(self):
         matrix = self.builder.getMatrix()
@@ -46,9 +66,9 @@ class ECircuit():
         painter.setTextSetting(self.builder.getItemLen(), 10)
         painter.draw()
 
-    def build(self, add_knots: bool = True):
+    def build(self):
         self.builder.setTable(self.items)
-        self.builder.build(add_knots)
+        self.builder.build()
         self.items = self.builder.getTable()
         self.matrix = self.builder.getMatrix()
         self.itemLen = self.builder.getItemLen()
@@ -108,3 +128,20 @@ class ECircuit():
         for item in newItems:
             if self.itemIsValid(item):
                 self.items.append(item)
+
+    def start(self):
+        os.system('cls')
+        while True:
+            try:
+                size = 0
+                print("\n")
+                for item in self.menu_items:
+                    size += 1
+                    print("{0} {1}".format(size, item[0]))
+                cin = input("Выберите пункт меню >> ")
+                os.system('cls')
+                if int(cin) in range(0, size + 1):
+                    for foo in self.menu_items[int(cin) - 1][1]:
+                        foo()
+            except Exception as e:
+                continue
