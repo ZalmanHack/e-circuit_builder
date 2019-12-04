@@ -48,8 +48,12 @@ class ECircuit_Minimize():
                 return True
         return False
 
+    def is_dublicated(self, element):
+        pass
+
     def _update_element(self, items_is_template: bool,  index, column, foundRows: list, foundItems, iteration: int = 1, searchingElement: str = ""):
         if items_is_template and len(foundRows) > 1:
+            is_knot = self._is_knot(self.items[foundRows[0]][0])
             new_item = "{0}.{1}/{2}".format(iteration, self.elemen_minimize, len(foundRows))
             self.elemen_minimize += 1
             # self.items[index][column] = new_item
@@ -201,8 +205,18 @@ class ECircuit_Minimize():
                                     nodes.append(node)
                             for i in temp_to_delete:
                                     to_delete.append(i)
+
                         if len(foundItems) > 1 and self._is_knot(searchingElement) and searchingElement not in nodes:
-                            for i in range(0, len(self.items[foundItems[-2]])):
+                            # проверка на наличие узла в других ветках
+                            quantity = 0
+                            for item in self.items:
+                                for i in [1, 2]:
+                                    if item[i] == searchingElement:
+                                        quantity += 1
+                                    if quantity >= 2:
+                                        return nodes, to_delete
+                            # замена элемента
+                            for i in [1, 2]:
                                 if self.items[foundItems[-2]][i] == searchingElement:
                                     self.items[foundItems[-2]][i] = self.items[foundItems[-1]][1]
                                     to_delete.append(index)
@@ -244,7 +258,7 @@ class ECircuit_Minimize():
         iterations = 1
         for _ in range(10):
             table_size = len(self.items)
-            self._elementSearch("START", [], iterations)
+            self._elementSearch("A", [], iterations)
             nodes, items_to_delete = self.deleting_unnecessary_nodes("START",[])
             items_to_delete.sort(reverse=True)
             for item in items_to_delete:

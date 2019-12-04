@@ -31,11 +31,12 @@ class ECircuit_Build():
                     else:  # иначе
                         foundedItems.append(index)  # помечаем как найденный
                         if self.items[index][-1] == '0':  # проверяем на тип "функциональный"
-                            self._create_knots(self.items[index][1], foundedItems.copy())
+                            foundedItems = self._create_knots(self.items[index][1], foundedItems.copy())
                         else:  # иначе он является предикатным
-                            self._create_knots(self.items[index][1], foundedItems.copy())
-                            self._create_knots(self.items[index][2], foundedItems.copy())
+                            foundedItems = self._create_knots(self.items[index][1], foundedItems.copy())
+                            foundedItems = self._create_knots(self.items[index][2], foundedItems.copy())
                     break
+        return foundedItems
 
 # проход по таблице и создание матрицы ---------------------------------------------------------------------------------
 
@@ -162,6 +163,8 @@ class ECircuit_Build():
 
     def build(self, add_knots: bool = True):  # построение Е-схемы
         self.matrix = [[""] * len(self.items) * 15 for i in range(len(self.items) * 15)]
+        self.element_with_knots = []
+        self.knot_quantity = 0
         self._create_knots("START", [])
         self._elementSearch('START', [], 0, 0)
         self._addingLines()
