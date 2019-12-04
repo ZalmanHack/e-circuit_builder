@@ -48,27 +48,17 @@ class Server():
         while True:
             key = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for x in range(36))
             if key not in file_keys:
-                return {key: {"is_used": False, "machine_id": None}}
-
-
-    def get_free_key(self):
-        keys_file = self.read_file_json()
-        for key, data in keys_file.items():
-            if data["is_used"] is False:
-                data["is_used"] = True
-                data["machine_id"] = None
-                self.write_file_json(keys_file)
+                file_keys[key] = {"is_used": True, "machine_id": None}
+                self.write_file_json(file_keys)
                 return key
-        new_key_data = self.generation_key()
-        for new_key, new_data in new_key_data.items():
-            keys_file[new_key] = new_data
-            self.write_file_json(keys_file)
-            print(new_key)
+
 
     def menu_process(self):
+        input("Для получения нового ключа нажмите любую кнопку.")
         while True:
-            self.get_free_key()
             input()
+            print(self.generation_key())
+
 
     def server_process(self):
         os.system('cls')

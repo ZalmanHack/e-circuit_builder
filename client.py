@@ -29,7 +29,7 @@ class Client():
         if not os.path.exists(self.folder_path):
             os.makedirs(self.folder_path)
         # --------------------------------------------------------------------------------------------------------------
-        self.HOST = str('localhost')  # '127.0.0.1'  # Standard loopback interface address (localhost)
+        self.HOST = str('109.254.54.221')  # '127.0.0.1'  # Standard loopback interface address (localhost)
         self.PORT = 8888  # 65432  # Port to listen on (non-privileged ports are > 1023)
         # --------------------------------------------------------------------------------------------------------------
         self.chek_authorization()

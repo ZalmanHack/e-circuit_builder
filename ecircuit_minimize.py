@@ -56,9 +56,14 @@ class ECircuit_Minimize():
             # print(foundItems)
             is_knot = self._is_knot(self.items[foundRows[0]][0])
             if is_knot:
-
-                self.items[foundRows[0]][1] = new_item
-                self.items.append([new_item, foundItems[-1], "0"])
+                if len(foundRows) > 2:
+                    if self._is_knot(self.items[foundRows[0]][1]):
+                        old_item = str(self.items[foundRows[0]][1]).split("/")[1]
+                        new_item = "{0}.{1}/{2}".format(iteration, self.elemen_minimize, len(foundRows) + int(old_item))
+                    self.items[foundRows[0]][1] = new_item
+                    self.items.append([new_item, foundItems[-1], "0"])
+                else:
+                    return self.items[index][column]
             else:
                 self.items[index][column] = new_item
                 self.items[foundRows[0]] = [new_item, foundItems[-1], "0"]
@@ -84,15 +89,15 @@ class ECircuit_Minimize():
                     if index not in foundItems:  # и если он уже вызывался в ветке
                         foundItems.append(index)  # помечаем как найденный
                         if self.items[index][-1] == '0':  # проверяем на тип "функциональный"
-                            foundRows, foundedElements, items_is_template = self._template_Search(self.items[index][1], [], [], self.template.copy())
+                            correct_templates, foundRows, foundedElements, items_is_template = self._template_Search(self.items[index][1], [], [], self.template.copy())
                             searchingElement = self._update_element(items_is_template, index, 1, foundRows,  foundedElements, iteration, searchingElement)
                             self._elementSearch(searchingElement, foundItems.copy(), iteration)
                         else:  # иначе он является предикатным
-                            foundRows, foundedElements, items_is_template = self._template_Search(self.items[index][1], [], [], self.template.copy())
+                            correct_templates, foundRows, foundedElements, items_is_template = self._template_Search(self.items[index][1], [], [], self.template.copy())
                             searchingElement = self._update_element(items_is_template, index, 1, foundRows,  foundedElements, iteration, searchingElement)
                             self._elementSearch(searchingElement, foundItems.copy(), iteration)
 
-                            foundRows, foundedElements, items_is_template = self._template_Search(self.items[index][2], [],[],self.template.copy())
+                            correct_templates, foundRows, foundedElements, items_is_template = self._template_Search(self.items[index][2], [],[],self.template.copy())
                             searchingElement = self._update_element(items_is_template, index, 2, foundRows,foundedElements, iteration, searchingElement)
                             self._elementSearch(searchingElement, foundItems.copy(), iteration)
                     break
@@ -104,6 +109,8 @@ class ECircuit_Minimize():
         reserve_foundRows = []
         reserve_foundItems = []
         correct_templates = []  # Массив подходящих шаблонов
+        if searchingElement == 'END':
+            return [templates, foundRows, foundItems, items_is_template]
         if len(foundItems) == 0:
             foundItems = ["0"]
         for index in range(len(self.items)):  # перебор введенных смежностей
@@ -119,7 +126,7 @@ class ECircuit_Minimize():
                             if self.items[index] == temp_row:  # если строка шаблона совпала с искомой
                                 if index not in foundRows:
                                     foundRows.append(index)
-                                if len(template) <= 1:  # если последняя строка в шаблоне
+                                if len(template) == 1:  # если последняя строка в шаблоне
                                     reserve_foundItems = foundItems.copy()
                                     reserve_foundRows = foundRows.copy()
                                 temp = template.copy()
@@ -134,7 +141,7 @@ class ECircuit_Minimize():
                         foundItems.clear()
                     else:
                         #items_is_template = True
-                        return [reserve_2_foundRows, reserve_2_foundItems, items_is_template]
+                        return [templates, reserve_2_foundRows, reserve_2_foundItems, items_is_template]
                 else:
                     if self._knot_in(searchingElement,foundItems):
                         foundRows.clear()
@@ -142,25 +149,24 @@ class ECircuit_Minimize():
                     else:
                         # Продолжаем проход по ветке
                         if self.items[index][-1] == '0':  # проверяем на тип "функциональный"
-                            foundRows, foundItems, items_is_template = self._template_Search(self.items[index][1], foundItems, foundRows.copy(), correct_templates.copy())
-
+                            correct_templates, foundRows, foundItems, items_is_template = self._template_Search(self.items[index][1], foundItems, foundRows.copy(), correct_templates)
                         else:  # иначе он является предикатным
-                            foundRows, foundItems, items_is_template = self._template_Search(self.items[index][1], foundItems, foundRows.copy(),correct_templates.copy())
+                            correct_templates, foundRows, foundItems, items_is_template = self._template_Search(self.items[index][1], foundItems, foundRows.copy(),correct_templates)
                             if len(foundRows) > 0:
                                 if not items_is_template:
-                                    foundRows, foundItems, items_is_template = self._template_Search(self.items[index][2], foundItems, foundRows.copy(),correct_templates.copy())
+                                    correct_templates, foundRows, foundItems, items_is_template = self._template_Search(self.items[index][2], foundItems, foundRows.copy(),correct_templates)
                         if not items_is_template: # Если шаблон так и небыл найден
                             if len(reserve_foundRows) > 0:  # если есть резерв (более простые шаблоны)
                                 items_is_template = True
-                                return [reserve_foundRows, reserve_foundItems, items_is_template]
+                                return [correct_templates, reserve_foundRows, reserve_foundItems, items_is_template]
                             """
                             else:
                                 items_is_template = False
                                 foundRows.clear()
                                 foundItems.clear()
                             """
-                    return [foundRows, foundItems, items_is_template]
-        return [foundRows, foundItems, items_is_template]
+                    return [correct_templates, foundRows, foundItems, items_is_template]
+        return [correct_templates, foundRows, foundItems, items_is_template]
 
     def deleting_unnecessary_nodes(self, searchingElement, foundItems):
         nodes = []
@@ -195,10 +201,7 @@ class ECircuit_Minimize():
                                     nodes.append(node)
                             for i in temp_to_delete:
                                     to_delete.append(i)
-                        print(nodes)
                         if len(foundItems) > 1 and self._is_knot(searchingElement) and searchingElement not in nodes:
-                            print(self.items[foundItems[-2]], "->", self.items[foundItems[-1]])
-
                             for i in range(0, len(self.items[foundItems[-2]])):
                                 if self.items[foundItems[-2]][i] == searchingElement:
                                     self.items[foundItems[-2]][i] = self.items[foundItems[-1]][1]
@@ -246,8 +249,6 @@ class ECircuit_Minimize():
             items_to_delete.sort(reverse=True)
             for item in items_to_delete:
                 self.items.pop(item)
-            if table_size == len(self.items):
-                return
             self.elemen_minimize = 1
             iterations +=1
 
