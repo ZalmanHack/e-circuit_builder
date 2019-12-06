@@ -1,39 +1,31 @@
-import turtle
+from turtle import Turtle, Screen
 import math
 
 class ECircuit_Draw():
 
     def __init__(self):
-        self.colors = {
-            'brown': {
-                'pen' : [112,109,83],
-                'fill': [212,208,176]
-            },
-            'Black': {
-                'pen': [0, 0, 0],
-                'fill': [255, 255, 255]
-            }
-        }
+        try:
+            self.matrix = []
 
-        self.matrix = []
+            self.textSize = 1
+            self.fontSize = 30
+            self.itemWidth = 100    # размер в пикселях
+            self.itemHeight = self.fontSize * 4   # размер в пикселях
 
-        self.textSize = 1
-        self.fontSize = 30
-        self.itemWidth = 100    # размер в пикселях
-        self.itemHeight = self.fontSize * 4   # размер в пикселях
+            self.matrixWidth = 0
+            self.matrixHeight = 0
 
-        self.matrixWidth = 0
-        self.matrixHeight = 0
-
-        self.circuit = turtle.Turtle()
-        self.circuit.speed(0)
-        self.circuit.pensize(2)
-        self.circuit.screen.colormode(255)
-        self.circuit.pencolor(0, 0, 0)
-        self.circuit.fillcolor(255,255,255)
-        #self.circuit.pencolor(112, 109, 83)
-        #self.circuit.fillcolor(212,208,176)
-        self.circuit.hideturtle()
+            self.circuit = Turtle()
+            self.circuit.speed(0)
+            self.circuit.pensize(2)
+            self.circuit.screen.colormode(255)
+            self.circuit.pencolor(0, 0, 0)
+            self.circuit.fillcolor(255,255,255)
+            #self.circuit.pencolor(112, 109, 83)
+            #self.circuit.fillcolor(212,208,176)
+            self.circuit.hideturtle()
+        except Exception as e:
+            print(e.args)
 
 
     def setMatrix(self, matrix):
@@ -44,7 +36,7 @@ class ECircuit_Draw():
     def setTextSetting(self, textSize, fontSize):
         self.fontSize = fontSize
         self.textSize = textSize
-        self.itemHeight = self.fontSize * 4
+        self.itemHeight = self.fontSize * 3
         self.itemWidth = self.textSize*self.fontSize
         if self.itemWidth < self.itemHeight:
             self.itemWidth = self.itemHeight
@@ -58,7 +50,7 @@ class ECircuit_Draw():
             self.circuit.forward(self.itemWidth / 2)
         self.circuit.right(90)
         self.circuit.forward(self.itemHeight / 2 + self.fontSize / 2)
-        self.circuit.write(text, True, align="center", font=("Arial", self.fontSize, 'normal'))
+        self.circuit.write(text, True, align="center", font=("Arial", self.fontSize, 'bold'))
         self.circuit.right(270)
         self.circuit.down()
 
@@ -203,58 +195,34 @@ class ECircuit_Draw():
                     self._drawStartEnd(self.matrix[i][j], j, i)
                 elif self.matrix[i][j] != '':
                     self._drawFunctionalItem(self.matrix[i][j], j, i)
-        turtle.Turtle().screen.mainloop()
+        self.circuit.screen.exitonclick()
+        del self.circuit
+        # self.circuit.screen.mainloop()
 
 
 
 if __name__ == "__main__":
 
-    matrix = [
-        [' ', ' ', ' '],
-        [' ', ' '],
-        [' ', ' ', ' ', ' ', ' '],
-        [' '],
-        [' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' '],
-    ]
+    while True:
+        wn = Screen()
+        wn.bgcolor("black")
+        wn.title("Space invaders")
 
-    init = DrawECircuit()
-    init.setMatrix(matrix)
+        border_pen = Turtle()
+        border_pen.speed("fastest")
+        border_pen.color("white")
+        border_pen.pensize(3)
 
-    init.draw()
+        border_pen.penup()
+        border_pen.setposition(-300, -300)
+        border_pen.pendown()
 
-    textSize = 10
-    fontSize = 10
-    itemWidth = textSize * fontSize
-    itemHeight = fontSize*4
+        for side in range(4):
+            border_pen.forward(600)
+            border_pen.left(90)
 
-    init.setTextSetting(textSize, fontSize)
-    init.drawStartEnd("start", -2*itemWidth, 0)
-    init._drawLine("horizontal", -itemWidth, 0)
+        border_pen.hideturtle()
 
-    init._drawPredicateItem("PRED", 0, 0)
 
-    init._drawAngle("down", 0, -itemHeight)
-    init._drawFunctionalItem("Лаба", itemWidth, -itemHeight)
-    init._drawLine("horizontal", 2*itemWidth,  -itemHeight)
-    init.drawStartEnd("end", 3*itemWidth, -itemHeight)
-
-    init._drawLine("vertical", 0, itemHeight)
-    init._drawAngle("up", 0, 2*itemHeight)
-
-    init._drawPredicateItem("PRED 2", itemWidth, 2*itemHeight)
-
-    init._drawAngle("down", itemWidth, itemHeight)
-    init._drawFunctionalItem("Лаба", 2*itemWidth, itemHeight)
-    init._drawLine("horizontal",  3*itemWidth, itemHeight)
-    init.drawStartEnd("end", 4*itemWidth, itemHeight)
-
-    init._drawAngle("up", itemWidth, 3*itemHeight)
-    init.drawStartEnd("end", 2*itemWidth, 3*itemHeight)
-
-    #init._drawFunctionalItem("Лаба по Масловой", 1, 100)
-    #init.setTextSetting(12, 7)
-    #init._drawFunctionalItem("Почти готова", -50, 30)
-
-    turtle.Turtle().screen.mainloop()
+        wn.exitonclick()
+        input("121232231")

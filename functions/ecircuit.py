@@ -35,7 +35,9 @@ class ECircuit:
 
     def show(self): # отображение Е-схемы на экране
         if self.mode == Mode.graphic:
+            print("Отрисовка схемы в отдельном окне...")
             self._graphic_show()
+            os.system('cls')
         if self.mode == Mode.console:
             self._console_show()
 
@@ -63,8 +65,9 @@ class ECircuit:
     def _graphic_show(self):
         painter = ECircuit_Draw()
         painter.setMatrix(self.builder.getMatrix())
-        painter.setTextSetting(self.builder.getItemLen(), 10)
+        painter.setTextSetting(self.builder.getItemLen(), 8)
         painter.draw()
+        del painter
 
     def build(self):
         self.builder.setTable(self.items)
@@ -119,6 +122,7 @@ class ECircuit:
                     break
             else:
                 print("Для завершения ввода нажмите 'exit'")
+        os.system('cls')
 
     def setTable(self, newItems): # задам таблицу смежности из готового списка
         self.items = []
@@ -134,7 +138,6 @@ class ECircuit:
         while True:
             try:
                 size = 0
-                print("\n")
                 for item in self.menu_items:
                     size += 1
                     print("{0} {1}".format(size, item[0]))

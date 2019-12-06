@@ -62,34 +62,41 @@ class Server():
 
     def server_process(self):
         os.system('cls')
-        self.sock.listen()
-        while True:
-            conn, addr = self.sock.accept()
-            print('connected:', addr)
-            data = conn.recv(1024)
-            if not data:
-                conn.close()
-            else:
-                data = json.loads(data)
-                key = data[1]
-                machine_id = data[0]
 
-                keys_file = self.read_file_json()
-                xor_data = "-1"
-                activation = False
-                if key in keys_file:
-                    if keys_file[key]["is_used"] is True:
-                        if keys_file[key]["machine_id"] == machine_id or keys_file[key]["machine_id"] is None:
-                            activation = True
-                            keys_file[key]["machine_id"] = machine_id
-                            self.write_file_json(keys_file)
-                            xor_data = self.get_xor(machine_id, key)
-                conn.send(bytes(xor_data, encoding="utf-8"))
-                # answer = json.dumps(xor_data).encode("utf-8")
-                print("    Серийный номер компьютера: ", machine_id)
-                print("    Введенный ключ активации:  ", key)
-                print("    Активация продукта:        ", activation)
-            conn.close()
+        while True:
+            data = None
+            try:
+                self.sock.listen()
+                conn, addr = self.sock.accept()
+                print('connected:', addr)
+                data = conn.recv(1024)
+                if not data:
+                    conn.close()
+                else:
+                    data = json.loads(data)
+                    key = data[1]
+                    machine_id = data[0]
+
+                    keys_file = self.read_file_json()
+                    xor_data = "-1"
+                    activation = False
+                    if key in keys_file:
+                        if keys_file[key]["is_used"] is True:
+                            if keys_file[key]["machine_id"] == machine_id or keys_file[key]["machine_id"] is None:
+                                activation = True
+                                keys_file[key]["machine_id"] = machine_id
+                                self.write_file_json(keys_file)
+                                xor_data = self.get_xor(machine_id, key)
+                    conn.send(bytes(xor_data, encoding="utf-8"))
+                    # answer = json.dumps(xor_data).encode("utf-8")
+                    print("    Серийный номер компьютера: ", machine_id)
+                    print("    Введенный ключ активации:  ", key)
+                    print("    Активация продукта:        ", activation)
+                conn.close()
+            except Exception as E:
+                print("    data: ", data)
+                print("    Error:", E.args)
+
 
 if __name__ == "__main__":
     server = Server()

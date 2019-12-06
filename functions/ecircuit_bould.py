@@ -7,7 +7,7 @@ class ECircuit_Build():
         self.itemLen = 6
         self.startIsValid = False # проверка на существование блока старт в таблице (items)
 
-# проход по таблийе и создание узлов -----------------------------------------------------------------------------------
+    # проход по таблице и создание узлов ___________________________________________________________________________________
     def _add_knot(self, searchingElement):
         if searchingElement not in self.element_with_knots:
             self.element_with_knots.append(searchingElement)
@@ -21,15 +21,16 @@ class ECircuit_Build():
                         if item[i] == searchingElement:
                             item[i] = knot
 
-    def _create_knots(self, searchingElement, foundedItems):  # рекурсивный спуск по дереву
-        if searchingElement != 'END':  # Если элемент указывает на конец то пишем конец
+    # рекурсивный спуск по дерев для создания узлов ____________________________________________________________________
+    def _create_knots(self, searchingElement, foundedItems):
+        if searchingElement != 'END':             # Если элемент указывает на конец то пишем конец
             for index in range(len(self.items)):  # перебор введенных смежностей
                 if searchingElement == self.items[index][0]:  # если нашли такой
-                    if index in foundedItems:  # и если он уже вызывался в ветке
+                    if index in foundedItems:    # и если он уже вызывался в ветке
                         # создание узла (очень нужно для 2 проги)
                         self._add_knot(searchingElement)
                     else:  # иначе
-                        foundedItems.append(index)  # помечаем как найденный
+                        foundedItems.append(index)        # помечаем как найденный
                         if self.items[index][-1] == '0':  # проверяем на тип "функциональный"
                             foundedItems = self._create_knots(self.items[index][1], foundedItems.copy())
                         else:  # иначе он является предикатным
@@ -38,40 +39,40 @@ class ECircuit_Build():
                     break
         return foundedItems
 
-# проход по таблице и создание матрицы ---------------------------------------------------------------------------------
-
+    # проход по таблице и создание матрицы _____________________________________________________________________________
     def _elementSearch(self, searchingElement, foundedItems, mI, mJ): # рекурсивный спуск по дереву
         if searchingElement == 'END':  # Если элемент указывает на конец то пишем конец
             self.matrix[mI][mJ] = 'END'
         else:
-            for index in range(len(self.items)):  # перебор введенных смежностей
-                if searchingElement == self.items[index][0]:  # если нашли такой
-                    if index in foundedItems:  # и если он уже вызывался в ветке
+            for index in range(len(self.items)):                # перебор введенных смежностей
+                if searchingElement == self.items[index][0]:    # если нашли такой
+                    if index in foundedItems:                   # и если он уже вызывался в ветке
                         self.matrix[mI][mJ] = searchingElement  # добавляем в матрицу
                     else:  # иначе
-                        foundedItems.append(index)  # помечаем как найденный
-                        if self.items[index][-1] == '0':  # проверяем на тип "функциональный"
+                        foundedItems.append(index)                  # помечаем как найденный
+                        if self.items[index][-1] == '0':            # проверяем на тип "функциональный"
                             self.matrix[mI][mJ] = searchingElement  # если да, то отображаем и идем по ветке далее
                             mJ += 1
                             self.matrix[mI][mJ] = "─"
                             mI = self._elementSearch(self.items[index][1], foundedItems.copy(), mI, mJ + 1)
                         else:  # иначе он является предикатным
                             self.matrix[mI][mJ] = searchingElement + "┤"  # отображаем в матрице
-                            self._moveMatrix(mI)  # перемещаем текущую и нижние строки на 1 вниз
+                            self._moveMatrix(mI)       # перемещаем текущую и нижние строки на 1 вниз
                             self.matrix[mI][mJ] = "┌"  # добавляем уголок и идем далее по правдивой ветке
                             self.matrix[mI][mJ+1] = "─"
                             mI = self._elementSearch(self.items[index][1], foundedItems.copy(), mI, mJ + 2)
-                            mI += 1  # становимся на центр предиката
-                            self._moveMatrix(mI + 1)  # двигаем матрицу вниз без текущей строки
+                            mI += 1                        # становимся на центр предиката
+                            self._moveMatrix(mI + 1)       # двигаем матрицу вниз без текущей строки
                             self.matrix[mI + 1][mJ] = "└"  # добавляем уголок и идем далее по ложной ветке
                             self.matrix[mI + 1][mJ + 1] = "─"
                             mI = self._elementSearch(self.items[index][2], foundedItems.copy(), mI + 1, mJ + 2)
                     break
         return mI
 
-# пост и пред обработка матрицы ----------------------------------------------------------------------------------------
+# ============================================ пост и пред обработка матрицы ===========================================
 
-    def _addingLines(self):  # добавление связующих вертиакальных линий
+    # добавление связующих вертиакальных линий _________________________________________________________________________
+    def _addingLines(self):
         for i in range(len(self.matrix)):
             for j in range(len(self.matrix[i])):
                 if self.matrix[i][j] == "└":
@@ -87,6 +88,7 @@ class ECircuit_Build():
                         else:
                             break
 
+    # оптимизация размеров матрицы _____________________________________________________________________________________
     def _resizeMatrix(self):
         for index in range(len(self.matrix)):
             while len(self.matrix[index]) != 0 and self.matrix[index][-1] == "":
@@ -97,6 +99,7 @@ class ECircuit_Build():
                 newMatrix.append(row)
         self.matrix = newMatrix
 
+    # двигаем матрицу вниз без текущей строки __________________________________________________________________________
     def _moveMatrix(self, startRow): # сдвиг части матрицы вниз
         for i in range(len(self.matrix[0]) - 2, startRow - 1, -1):
             for j in range(len(self.matrix)):
@@ -161,11 +164,12 @@ class ECircuit_Build():
             else:
                 print("Для завершения ввода нажмите 'exit'")
 
-    def build(self, add_knots: bool = True):  # построение Е-схемы
+    # построение Е-схемы _______________________________________________________________________________________________
+    def build(self, add_knots: bool = True):
         self.matrix = [[""] * len(self.items) * 15 for i in range(len(self.items) * 15)]
         self.element_with_knots = []
         self.knot_quantity = 0
-        self._create_knots("START", [])
-        self._elementSearch('START', [], 0, 0)
-        self._addingLines()
-        self._resizeMatrix()
+        self._create_knots("START", [])         # создание узлов
+        self._elementSearch('START', [], 0, 0)  # поиск и отрисовка элементов
+        self._addingLines()   # добавление вертикальных лний в матрицу
+        self._resizeMatrix()  # оптимизация размеров матрицы

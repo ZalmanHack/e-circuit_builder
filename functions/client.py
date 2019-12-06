@@ -169,31 +169,3 @@ class Client():
                     return
         except Exception as e:
             return
-
-
-
-if __name__ == "__main__":
-    aut = Client(Mode.console)
-    current_machine_id = subprocess.check_output('wmic csproduct get uuid').decode().split('\n')[1].strip()
-    print(current_machine_id)
-    print(len(current_machine_id))
-
-    t = chr(ord("k") ^ ord("m"))
-    print(type(t))
-    """
-    a = "A"
-    b = "B"
-    c1 = chr(ord(a) ^ ord(b))
-    print(c1)
-    c1 = chr(ord(c1) ^ ord(b))
-    print(c1)
-    """
-"""
-    soc = socketProcess('127.0.0.1', 65432)
-    while True:
-        result = soc.lisening()
-        if result == None:
-            soc.connectToHost()
-        elif result["type"] == "table":
-            print("какое-то действие")
-"""
