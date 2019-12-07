@@ -1,0 +1,1 @@
+pyuic5 activationWindowUI.ui -o activationWindowUI.py

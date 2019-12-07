@@ -1,15 +1,16 @@
 import sys
 import os
 
-from ecircuit_bould import *
-from ecircuit_draw import *
-from ecircuit_minimize import *
+from PyQt5.QtCore import QObject
+
+from functions.ecircuit_bould import *
+from functions.ecircuit_draw import *
+from functions.ecircuit_minimize import *
 
 
 class Mode:
     graphic = 1
     console = 2
-
 
 class ECircuit:
     def __init__(self, mode: Mode = Mode.console):
