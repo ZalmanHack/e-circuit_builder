@@ -258,7 +258,7 @@ class ECircuit_Minimize():
         iterations = 1
         for _ in range(10):
             table_size = len(self.items)
-            self._elementSearch("A", [], iterations)
+            self._elementSearch("START", [], iterations)
             nodes, items_to_delete = self.deleting_unnecessary_nodes("START", [])
             items_to_delete.sort(reverse=True)
             for item in items_to_delete:

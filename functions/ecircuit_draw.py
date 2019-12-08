@@ -6,14 +6,12 @@ class ECircuit_Draw():
     def __init__(self):
         try:
             self.matrix = []
-
+            self.matrixWidth = 0
+            self.matrixHeight = 0
             self.textSize = 1
             self.fontSize = 30
             self.itemWidth = 100    # размер в пикселях
             self.itemHeight = self.fontSize * 4   # размер в пикселях
-
-            self.matrixWidth = 0
-            self.matrixHeight = 0
 
             self.circuit = Turtle()
             self.circuit.speed(0)
@@ -21,8 +19,6 @@ class ECircuit_Draw():
             self.circuit.screen.colormode(255)
             self.circuit.pencolor(0, 0, 0)
             self.circuit.fillcolor(255,255,255)
-            #self.circuit.pencolor(112, 109, 83)
-            #self.circuit.fillcolor(212,208,176)
             self.circuit.hideturtle()
         except Exception as e:
             print(e.args)

@@ -7,7 +7,13 @@ class ECircuit_Build():
         self.itemLen = 6
         self.startIsValid = False # проверка на существование блока старт в таблице (items)
 
-    # проход по таблице и создание узлов ___________________________________________________________________________________
+    # проверка на то, является ли элемент узлом ________________________________________________________________________
+    def _is_knot(self, searchingElement: str):
+        if searchingElement[0] == "(" or searchingElement[-1] == ")":
+            return True
+        return False
+
+    # проход по таблице и создание узлов _______________________________________________________________________________
     def _add_knot(self, searchingElement):
         if searchingElement not in self.element_with_knots:
             self.element_with_knots.append(searchingElement)
@@ -47,10 +53,16 @@ class ECircuit_Build():
             for index in range(len(self.items)):                # перебор введенных смежностей
                 if searchingElement == self.items[index][0]:    # если нашли такой
                     if index in foundedItems:                   # и если он уже вызывался в ветке
+                        if self._is_knot(searchingElement):     # если это узел то идем назад и пишем его на месте черты
+                            mJ -= 1
                         self.matrix[mI][mJ] = searchingElement  # добавляем в матрицу
                     else:  # иначе
                         foundedItems.append(index)                  # помечаем как найденный
-                        if self.items[index][-1] == '0':            # проверяем на тип "функциональный"
+                        if self._is_knot(searchingElement):         # если это узел то пишем нго вместо прошлой -
+                            mJ -= 1
+                            self.matrix[mI][mJ] = searchingElement  # если да, то отображаем и идем по ветке далее
+                            mI = self._elementSearch(self.items[index][1], foundedItems.copy(), mI, mJ + 1)
+                        elif self.items[index][-1] == '0':            # проверяем на тип "функциональный"
                             self.matrix[mI][mJ] = searchingElement  # если да, то отображаем и идем по ветке далее
                             mJ += 1
                             self.matrix[mI][mJ] = "─"
@@ -173,3 +185,4 @@ class ECircuit_Build():
         self._elementSearch('START', [], 0, 0)  # поиск и отрисовка элементов
         self._addingLines()   # добавление вертикальных лний в матрицу
         self._resizeMatrix()  # оптимизация размеров матрицы
+        print(self.matrix)

@@ -1,20 +1,19 @@
 import sys
 import os
 
-from PyQt5.QtCore import QObject
+from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
 from functions.ecircuit_bould import *
 from functions.ecircuit_draw import *
 from functions.ecircuit_minimize import *
 
 
-class Mode:
-    graphic = 1
-    console = 2
-
-class ECircuit:
-    def __init__(self, mode: Mode = Mode.console):
-        self.mode = mode
+class ECircuit(QObject):
+    built = pyqtSignal(list, int)
+    minimized = pyqtSignal(list, list, int)
+    structured = pyqtSignal(list, list, int)
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self.builder = ECircuit_Build()
         self.minimizer = ECircuit_Minimize()
 
@@ -27,25 +26,15 @@ class ECircuit:
             ["| Ввод таблицы смежности        |", [self.enterTable]],
             ["| Генерировать Е-Схему          |", [self.build, self.show]],
             ["| Минимизировать Е-Схему        |", [self.build, self.minimize, self.build, self.show]],
-            ["| Отобразить таблицу смежности  |", [self.show_items]],
-            ["| Выйти из программы            |", [self.get_quit]]
+            ["| Отобразить таблицу смежности  |", [self.show_items]]
         ]
 
-    def get_quit(self):
-        sys.exit(0)
-
     def show(self): # отображение Е-схемы на экране
-        if self.mode == Mode.graphic:
-            print("Отрисовка схемы в отдельном окне...")
-            self._graphic_show()
-            os.system('cls')
-        if self.mode == Mode.console:
-            self._console_show()
+        self._console_show()
 
     def show_items(self):
         for item in self.items:
             print(",".join(item))
-
 
     def _console_show(self):
         matrix = self.builder.getMatrix()
@@ -70,20 +59,42 @@ class ECircuit:
         painter.draw()
         del painter
 
-    def build(self):
+    def _build(self):
         self.builder.setTable(self.items)
         self.builder.build()
         self.items = self.builder.getTable()
         self.matrix = self.builder.getMatrix()
         self.itemLen = self.builder.getItemLen()
+        self.show()
 
+    @pyqtSlot()
+    def build(self):
+        self._build()
+        self.built.emit(self.matrix, self.itemLen)
+
+    @pyqtSlot()
     def minimize(self):
+        self._build()
         self.minimizer.setTable(self.items)
         self.minimizer.build()
         self.items = self.minimizer.getTable()
+        self._build()
+        self.minimized.emit(self.matrix, self.items, self.itemLen)
 
+    @pyqtSlot()
     def getTable(self):
-        return self.items
+        self.sendTable.emit(self.items)  # отправляем в ответ таблицу сежностией
+
+    @pyqtSlot(list)
+    def setTable(self, newItems): # задам таблицу смежности из готового списка
+        self.items = []
+        self.matrix = []
+        self.itemLen = 6
+        self.startIsValid = False  # проверка на существование блока старт в таблице (items)
+        for item in newItems:
+            if self.itemIsValid(item):
+                self.items.append(item)
+        print(self.items)
 
     def itemIsValid(self, item):  # проверка корректности строки из таблицы смежности
         if len(item) == 3:
@@ -125,15 +136,6 @@ class ECircuit:
                 print("Для завершения ввода нажмите 'exit'")
         os.system('cls')
 
-    def setTable(self, newItems): # задам таблицу смежности из готового списка
-        self.items = []
-        self.matrix = []
-        self.itemLen = 6
-        self.startIsValid = False  # проверка на существование блока старт в таблице (items)
-        for item in newItems:
-            if self.itemIsValid(item):
-                self.items.append(item)
-
     def start(self):
         os.system('cls')
         while True:
@@ -149,3 +151,8 @@ class ECircuit:
                         foo()
             except Exception as e:
                 continue
+
+
+if __name__ == "__main__":
+    test = ECircuit()
+    test.start()
