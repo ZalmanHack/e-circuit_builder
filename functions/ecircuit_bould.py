@@ -5,6 +5,7 @@ class ECircuit_Build():
         self.element_with_knots = []
         self.matrix = []
         self.itemLen = 6
+        self.branches = []  # массив веток (для вовда веток построчно в интерфесе)
         self.startIsValid = False # проверка на существование блока старт в таблице (items)
 
     # проверка на то, является ли элемент узлом ________________________________________________________________________
@@ -12,6 +13,14 @@ class ECircuit_Build():
         if searchingElement[0] == "(" or searchingElement[-1] == ")":
             return True
         return False
+
+    # добавление найденой полноценной вктки в массив веток (нужно только для вывода в интерфейсе) ______________________
+    def appendBranches(self, foundRows: list, searchingElement: str):
+        result = []
+        for row in foundRows:
+            result.append(self.items[row][0])
+        result.append(searchingElement)
+        self.branches.append(result)
 
     # проход по таблице и создание узлов _______________________________________________________________________________
     def _add_knot(self, searchingElement):
@@ -48,11 +57,13 @@ class ECircuit_Build():
     # проход по таблице и создание матрицы _____________________________________________________________________________
     def _elementSearch(self, searchingElement, foundedItems, mI, mJ): # рекурсивный спуск по дереву
         if searchingElement == 'END':  # Если элемент указывает на конец то пишем конец
+            self.appendBranches(foundedItems, searchingElement)                  # добавляем новую ветку
             self.matrix[mI][mJ] = 'END'
         else:
             for index in range(len(self.items)):                # перебор введенных смежностей
                 if searchingElement == self.items[index][0]:    # если нашли такой
                     if index in foundedItems:                   # и если он уже вызывался в ветке
+                        self.appendBranches(foundedItems, searchingElement)      # добавляем новую ветку
                         if self._is_knot(searchingElement):     # если это узел то идем назад и пишем его на месте черты
                             mJ -= 1
                         self.matrix[mI][mJ] = searchingElement  # добавляем в матрицу
@@ -147,6 +158,9 @@ class ECircuit_Build():
     def getMatrix(self):
         return self.matrix
 
+    def get_branches(self):
+        return self.branches
+
     def setTable(self, newItems): # задам таблицу смежности из готового списка
         self.items = []
         self.matrix = []
@@ -181,7 +195,9 @@ class ECircuit_Build():
         self.matrix = [[""] * len(self.items) * 15 for i in range(len(self.items) * 15)]
         self.element_with_knots = []
         self.knot_quantity = 0
-        self._create_knots("START", [])         # создание узлов
+        self.branches = []
+        if add_knots:
+            self._create_knots("START", [])         # создание узлов
         self._elementSearch('START', [], 0, 0)  # поиск и отрисовка элементов
         self._addingLines()   # добавление вертикальных лний в матрицу
         self._resizeMatrix()  # оптимизация размеров матрицы

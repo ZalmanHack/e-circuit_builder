@@ -88,7 +88,6 @@ class ECircuit_Minimize():
 
     # поиск элемента в таблице смежности _______________________________________________________________________________
     def _elementSearch(self, searchingElement, foundItems, iteration):  # рекурсивный спуск по дереву
-        changed = False
         # elemen_minimize какой по счету элемент будет свернут в данной итерации (чисто для названия)
         if searchingElement != 'END':  # Если элемент указывает на конец то пишем конец
             for index in range(len(self.items)):  # перебор введенных смежностей
@@ -221,35 +220,11 @@ class ECircuit_Minimize():
                                     break
         return nodes, to_delete
 
-    # проверка корректности строки из таблицы смежности ________________________________________________________________
-    def itemIsValid(self, item):
-        if len(item) == 3:
-            if item[0] == "START":
-                if not self.startIsValid:
-                    self.startIsValid = True
-                    return True
-                else:
-                    self.startIsValid = False
-                    return False
-            elif item[0] == "END":
-                return False
-            else:
-                if self.itemLen < len(max(item, key=len)):
-                    self.itemLen = len(max(item, key=len))
-                    if self.itemLen % 2 != 0:
-                        self.itemLen += 1
-                return True
-        else:
-            return False
-
     # задам таблицу смежности из готового списка _______________________________________________________________________
     def setTable(self, newItems):
         self.items = []
-        self.matrix = []
-        self.itemLen = 6
-        self.startIsValid = False  # проверка на существование блока старт в таблице (items)
         for item in newItems:
-            if self.itemIsValid(item):
+            if len(item) == 3:
                 self.items.append(item)
 
     # главнй метод построения __________________________________________________________________________________________

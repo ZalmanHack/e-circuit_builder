@@ -1,11 +1,10 @@
 import sys
 import os
-import time
 import json
 import pickle
 import socket
 import subprocess
-from PyQt5.QtCore import QThread, QObject, pyqtSignal, pyqtSlot, QTimer
+from PyQt5.QtCore import QObject, pyqtSlot, QTimer
 from PyQt5.Qt import QApplication, QMessageBox
 
 from interfaces.activationWindow import ActivationWindow
@@ -15,7 +14,6 @@ class MainProcess(QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.key_len = 36
-        self.time_left = 300
         self.key = None
         self.folder_path = os.path.expanduser('~') + "\\.E-Circuit builder"
         self.file_name = "authorization.bin"
@@ -27,8 +25,8 @@ class MainProcess(QObject):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.timeout)
         # --------------------------------------------------------------------------------------------------------------
+        self.mainWindow = MainWindow()
         if self.is_activated():
-            self.mainWindow = MainWindow()
             self.mainWindow.show()
         else:
             self.start_activationWindow()
@@ -38,19 +36,21 @@ class MainProcess(QObject):
         self.activationWindow = ActivationWindow(time_left=time_left, key_len=self.key_len)
         self.activationWindow.send_key.connect(self.send_key_to_server)
         self.activationWindow.pushFree.clicked.connect(self.startFreePeriod)
+        self.mainWindow.closed.connect(self.mainWindow_closed)
         self.activationWindow.show()
 
+    @pyqtSlot()
     def mainWindow_closed(self):
         self.activationWindow.show()
         self.timer.stop()
 
+    @pyqtSlot()
     def startFreePeriod(self):
         self.timer.start(1000)
         self.activationWindow.close()
-        self.mainWindow = MainWindow()
-        self.mainWindow.closed.connect(self.mainWindow_closed)
         self.mainWindow.show()
 
+    @pyqtSlot()
     def timeout(self):
         time_left = self.get_activation()[3]
         time_left -= 1
@@ -70,12 +70,8 @@ class MainProcess(QObject):
             self.activationWindow.show()
             self.mainWindow.close()
 
-
     def get_current_machine_id(self):
         return subprocess.check_output('wmic csproduct get uuid').decode().split('\n')[1].strip()
-
-    def exit_program(self):
-        print("1234567")
 
     # работа с файлом активации ________________________________________________________________________________________
     def get_activation(self):
@@ -88,7 +84,7 @@ class MainProcess(QObject):
             info = pickle.load(file)
         return info
 
-    def set_activation(self, password=None, key=None, time_left: int = 300):
+    def set_activation(self, password=None, key=None, time_left: int = 120):
         if not os.path.exists(self.folder_path):
             os.makedirs(self.folder_path)
         with open("{0}\\{1}".format(self.folder_path, self.file_name), 'wb') as file:
@@ -137,7 +133,7 @@ class MainProcess(QObject):
             sock.close()
             password = str(data, encoding="utf-8")
             if self.xor(self.current_machine_id, key) == password:
-                self.set_activation(password=password, key=key, time_left=self.time_left)
+                self.set_activation(password=password, key=key)
                 msg.setText("Активация успешно пройдена")
                 check = True
             else:
@@ -149,7 +145,7 @@ class MainProcess(QObject):
         msg.exec_()
         if check is True:
             self.activationWindow.close()
-            self.mainWindow = MainWindow()
+            self.mainWindow.closed.disconnect(self.mainWindow_closed)
             self.mainWindow.show()
 
 if __name__ == "__main__":

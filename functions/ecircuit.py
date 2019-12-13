@@ -6,16 +6,18 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 from functions.ecircuit_bould import *
 from functions.ecircuit_draw import *
 from functions.ecircuit_minimize import *
+from functions.ecircuit_structuring import *
 
 
 class ECircuit(QObject):
-    built = pyqtSignal(list, int)
-    minimized = pyqtSignal(list, list, int)
-    structured = pyqtSignal(list, list, int)
+    built = pyqtSignal(list, list, int)
+    minimized = pyqtSignal(list, list, list, int)
+    structured = pyqtSignal(list, list, list, int)
     def __init__(self, parent=None):
         super().__init__(parent)
         self.builder = ECircuit_Build()
         self.minimizer = ECircuit_Minimize()
+        self.structurer = ECircuit_Structuring()
 
         self.items = []
         self.matrix = []
@@ -59,18 +61,20 @@ class ECircuit(QObject):
         painter.draw()
         del painter
 
-    def _build(self):
+    def _build(self, add_knots: bool = True):
         self.builder.setTable(self.items)
-        self.builder.build()
+        self.builder.build(add_knots)
         self.items = self.builder.getTable()
         self.matrix = self.builder.getMatrix()
         self.itemLen = self.builder.getItemLen()
+        self.branches = self.builder.get_branches()
         self.show()
+
 
     @pyqtSlot()
     def build(self):
         self._build()
-        self.built.emit(self.matrix, self.itemLen)
+        self.built.emit(self.branches, self.matrix, self.itemLen)
 
     @pyqtSlot()
     def minimize(self):
@@ -79,11 +83,16 @@ class ECircuit(QObject):
         self.minimizer.build()
         self.items = self.minimizer.getTable()
         self._build()
-        self.minimized.emit(self.matrix, self.items, self.itemLen)
+        self.minimized.emit(self.branches, self.matrix, self.items, self.itemLen)
 
     @pyqtSlot()
-    def getTable(self):
-        self.sendTable.emit(self.items)  # отправляем в ответ таблицу сежностией
+    def structuring(self):
+        self.structurer.setTable(self.items)
+        self.structurer.build()
+        self.items = self.structurer.getTable()
+        self._build(add_knots=False)
+        self.structured.emit(self.branches, self.matrix, self.items, self.itemLen)
+
 
     @pyqtSlot(list)
     def setTable(self, newItems): # задам таблицу смежности из готового списка

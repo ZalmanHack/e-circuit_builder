@@ -17,6 +17,7 @@ class ActivationWindow(QWidget, activationWindowUI.Ui_Form):
         self.initUI()
 
     def initUI(self):
+        self.window().setWindowTitle("Активация")
         self.set_label_time(self.time_left)
         self.lineEditKey.setVisible(False)
         self.lineEditKey.setMaxLength(self.key_len)

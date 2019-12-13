@@ -21,10 +21,11 @@ class MyGraphicView(QGraphicsView):
         # сцена --------------------------------------------------------------------------------------------------------
         self.scene = QGraphicsScene()
         self.setScene(self.scene)
+        self.scene.setBackgroundBrush(QBrush(Qt.white))
         # таймер отрисовки ---------------------------------------------------------------------------------------------
         self.timer = QTimer()
         self.timer.timeout.connect(self.timeout)
-        self.timer.start(50)
+        self.timer.start(1)
         # шрифт --------------------------------------------------------------------------------------------------------
         self.font = QFont()
         self.font.setPixelSize(25)
@@ -42,16 +43,19 @@ class MyGraphicView(QGraphicsView):
         self.setTextSetting(textSize=7,fontSize=50)
 
     def timeout(self):
-        """
-        self._drawPredict("Шлюха",0,0)
-        self._drawNode("2", 2, 0)
-        self._drawLine(row=3,column=1)
-        self._drawLine(self.TypesLine.down, 3, 0)
-        width = 300
-        height = 300
-        self.scene.setSceneRect(0, 0, width, height)
-        """
-        self.timer.stop()
+        if self.horizontalScrollBar().isVisible():
+            self.scale(0.99,0.99)
+        else:
+            self.timer.stop()
+
+
+    def resizeScene(self):
+        if len(self.matrix) > 0:
+            width = self.itemWidth * max([len(a) for a in self.matrix])
+            height = self.itemHeight * len(self.matrix)
+            self.scene.setSceneRect(0, 0, width, height)
+        else:
+            self.scene.setSceneRect(0, 0, 50, 50)
 
     @pyqtSlot(list)
     def setMatrix(self, matrix):
@@ -64,7 +68,7 @@ class MyGraphicView(QGraphicsView):
         self.font.setPixelSize(fontSize)
         self.textSize = textSize + 2
         self.itemHeight = self.font.pixelSize() * 2
-        self.itemWidth = self.textSize * self.font.pixelSize()
+        self.itemWidth = textSize * self.font.pixelSize()
         if self.itemWidth < self.itemHeight:
             self.itemWidth = self.itemHeight
 
@@ -78,7 +82,7 @@ class MyGraphicView(QGraphicsView):
         text_lenght = g_text.boundingRect().width()
         print(text_lenght)
         start = QPoint()  # начальная позиция для текущей отрисовки
-        start.setY(self.itemHeight/5)
+        start.setY(self.itemHeight/6)
         start.setX(self.itemWidth/2 - text_lenght/2)
         self.scene.addItem(g_text)
         g_text.setPos(start.x() + global_pos.x(), start.y() + global_pos.y())
@@ -164,7 +168,7 @@ class MyGraphicView(QGraphicsView):
     @pyqtSlot()
     def draw(self):
         self.scene.clear()
-        self.scene.setSceneRect(0,0,0,0)
+        self.resizeScene()
         for row in range(0, len(self.matrix)):
             for column in range(0, len(self.matrix[row])):
                 item = self.matrix[row][column]
@@ -183,6 +187,7 @@ class MyGraphicView(QGraphicsView):
                         self._drawPredict("".join(list(item)[:-1]), row, column)
                     else:
                         self._drawFunctional(item, row, column)
+        self.timer.start(1)
 
     def wheelEvent(self, e: QWheelEvent):
         print(e.x(), e.y(), e.angleDelta())
