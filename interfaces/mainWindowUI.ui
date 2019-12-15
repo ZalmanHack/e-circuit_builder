@@ -136,9 +136,7 @@
      <string>Операции</string>
     </property>
     <addaction name="pushMinimization"/>
-    <addaction name="separator"/>
     <addaction name="pushStructuring"/>
-    <addaction name="pushDestructuring"/>
     <addaction name="separator"/>
     <addaction name="pushClear"/>
    </widget>

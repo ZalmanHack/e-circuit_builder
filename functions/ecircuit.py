@@ -13,6 +13,8 @@ class ECircuit(QObject):
     built = pyqtSignal(list, list, int)
     minimized = pyqtSignal(list, list, list, int)
     structured = pyqtSignal(list, list, list, int)
+    error = pyqtSignal(str)
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.builder = ECircuit_Build()
@@ -78,20 +80,27 @@ class ECircuit(QObject):
 
     @pyqtSlot()
     def minimize(self):
-        self._build()
-        self.minimizer.setTable(self.items)
-        self.minimizer.build()
-        self.items = self.minimizer.getTable()
-        self._build()
-        self.minimized.emit(self.branches, self.matrix, self.items, self.itemLen)
+        if self.items:
+            self._build()
+            if self.minimizer.setTable(self.items):
+                self.minimizer.build()
+                self.items = self.minimizer.getTable()
+                self._build()
+                self.minimized.emit(self.branches, self.matrix, self.items, self.itemLen)
+            else:
+                self.error.emit("Минимизация с Case элементами не возможна.\n")
 
     @pyqtSlot()
     def structuring(self):
-        self.structurer.setTable(self.items)
-        self.structurer.build()
-        self.items = self.structurer.getTable()
-        self._build(add_knots=False)
-        self.structured.emit(self.branches, self.matrix, self.items, self.itemLen)
+        if self.items:
+            if self.structurer.setTable(self.items):
+                self.structurer.build()
+                self.items = self.structurer.getTable()
+                self._build(add_knots=False)
+                self.structured.emit(self.branches, self.matrix, self.items, self.itemLen)
+            else:
+                self.error.emit("Структурирование не возможно.\n"
+                                "Таблица смежности уже имеет Case элементы")
 
 
     @pyqtSlot(list)

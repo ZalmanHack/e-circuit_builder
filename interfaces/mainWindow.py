@@ -73,6 +73,7 @@ class MainWindow(QMainWindow, mainWindowUI.Ui_MainWindow):
         self.e_circuit.built.connect(self.built)  # сообщение от построителя с матрицей и дллиной текста
         self.e_circuit.minimized.connect(self.minimized)
         self.e_circuit.structured.connect(self.structured)
+        self.e_circuit.error.connect(self.msg_error)
         self.e_circuit.moveToThread(self.e_circuit_thread)
         self.e_circuit_thread.start()
 
@@ -115,11 +116,6 @@ class MainWindow(QMainWindow, mainWindowUI.Ui_MainWindow):
     def on_pushStructuring_triggered(self):
         self.ec_signals.setTable.emit(self.items)
         self.ec_signals.startStruct.emit()
-        msg = QMessageBox()
-        msg.setIcon(QMessageBox.Information)
-        msg.setText("Функция структурирования находится в разработке")
-        msg.setWindowTitle("Сообщение")
-        msg.exec_()
 
     @pyqtSlot()
     def on_pushExport_triggered(self):
@@ -145,6 +141,7 @@ class MainWindow(QMainWindow, mainWindowUI.Ui_MainWindow):
     def on_showTable_triggered(self):
         self.tableView.setVisible(self.showTable.isChecked())
 
+    @pyqtSlot(QCloseEvent)
     def closeEvent(self, event):
         self.closed.emit()
         return super(MainWindow, self).closeEvent(event)
@@ -162,6 +159,14 @@ class MainWindow(QMainWindow, mainWindowUI.Ui_MainWindow):
         self.updateGraphisView(matrix, textLen)
         self.updateTableView(items)
         self.updateBranchesText(branches)
+
+    @pyqtSlot(str)
+    def msg_error(self, text):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Information)
+        msg.setText(text)
+        msg.setWindowTitle("Сообщение")
+        msg.exec_()
 
     @pyqtSlot(list, list, int)
     def built(self,  branches: list, matrix: list, textLen: int):

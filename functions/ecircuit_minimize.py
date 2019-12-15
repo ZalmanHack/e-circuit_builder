@@ -58,15 +58,22 @@ class ECircuit_Minimize():
     def _update_element(self, items_is_template: bool, index, column, foundRows: list, foundItems, iteration: int = 1,
                         searchingElement: str = ""):
         if items_is_template and len(foundRows) > 1:
-            is_knot = self._is_knot(self.items[foundRows[0]][0])
-            new_item = "{0}.{1}/{2}".format(iteration, self.elemen_minimize, len(foundRows))
+            # считаем кол-во свернутых элементов
+            quantity_elemets = len(foundRows)
+            for element in foundItems[1:-1]:
+                try:
+                    if len(element.split('/')) == 2:
+                        quantity_elemets += int(element.split('/')[1])
+                except Exception as e:
+                    pass
+            new_item = "{0}.{1}/{2}".format(iteration, self.elemen_minimize, quantity_elemets)
             self.elemen_minimize += 1
             is_knot = self._is_knot(self.items[foundRows[0]][0])
             if is_knot:
                 if len(foundRows) > 2:
                     if self._is_knot(self.items[foundRows[0]][1]):
                         old_item = str(self.items[foundRows[0]][1]).split("/")[1]
-                        new_item = "{0}.{1}/{2}".format(iteration, self.elemen_minimize, len(foundRows) + int(old_item))
+                        new_item = "{0}.{1}/{2}".format(iteration, self.elemen_minimize, quantity_elemets + int(old_item))
                     self.items[foundRows[0]][1] = new_item
                     self.items.append([new_item, foundItems[-1], "0"])
                 else:
@@ -223,9 +230,14 @@ class ECircuit_Minimize():
     # задам таблицу смежности из готового списка _______________________________________________________________________
     def setTable(self, newItems):
         self.items = []
-        for item in newItems:
-            if len(item) == 3:
-                self.items.append(item)
+        for row in newItems:
+            for element in row:
+                if "I=" in element:
+                    return False
+        for row in newItems:
+            if len(row) == 3:
+                self.items.append(row)
+        return True
 
     # главнй метод построения __________________________________________________________________________________________
     def build(self):
