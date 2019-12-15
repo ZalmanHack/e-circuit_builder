@@ -28,10 +28,10 @@ class ECircuit_Build():
             self.element_with_knots.append(searchingElement)
             if searchingElement[0] != "(" or searchingElement[-1] != ")":
                 self.knot_quantity += 1
-                knot = "({})".format(self.knot_quantity)
+                knot = "({0})".format(self.knot_quantity)
                 self.items.append([knot, searchingElement, "0"])
                 # перебираем все вторые и третьи колонки и меняем искомый элемент на наш узел
-                for item in self.items[:-2]:
+                for item in self.items[:-1]:
                     for i in [1, 2]:
                         if item[i] == searchingElement:
                             item[i] = knot
