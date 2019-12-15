@@ -52,7 +52,6 @@ class MainWindow(QMainWindow, mainWindowUI.Ui_MainWindow):
         self.model = QStandardItemModel()
         self.model.setColumnCount(3)
         self.model.setRowCount(1)
-        self.model.setHorizontalHeaderLabels(["1","2","3"])
         self.model.setItem(0,0,QStandardItem("START"))
         self.model.dataChanged.connect(self.on_model_dataChanged)
         self.tableView.setModel(self.model)
@@ -131,15 +130,15 @@ class MainWindow(QMainWindow, mainWindowUI.Ui_MainWindow):
 
     @pyqtSlot()
     def on_showECircuit_triggered(self):
-        self.graphicView.setVisible(self.showECircuit.isChecked())
+        self.panelECircuit.setVisible(self.showECircuit.isChecked())
 
     @pyqtSlot()
     def on_showBranches_triggered(self):
-        self.plainTextEdit.setVisible(self.showBranches.isChecked())
+        self.panelBranches.setVisible(self.showBranches.isChecked())
 
     @pyqtSlot()
     def on_showTable_triggered(self):
-        self.tableView.setVisible(self.showTable.isChecked())
+        self.panelTable.setVisible(self.showTable.isChecked())
 
     @pyqtSlot(QCloseEvent)
     def closeEvent(self, event):
