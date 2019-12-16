@@ -1,7 +1,3 @@
-import json
-import sys
-import time
-
 class ECircuit_Structuring():
     def __init__(self):
         self.items = []  # таблица смежности
@@ -29,18 +25,20 @@ class ECircuit_Structuring():
                     if self.items[index][index_element] != "0":
                         if self.items[index][index_element] not in foundElements:
                             foundElements.append(self.items[index][index_element])
-                            self.items.append(["I={0}".format(len(foundElements)-1), "(1)", "0"])
+                            self.items.append(["I={0}".format(len(foundElements) - 1), "(1)", "0"])
                             foundElements = self._adding_I_elements(self.items[index][index_element], foundElements)
                         temp_index = foundElements.index(self.items[index][index_element])
                         self.items[index][index_element] = "I={0}".format(temp_index)
                 break
         return foundElements
 
+    # проверка элемента на то, является ли он уззлом ___________________________________________________________________
     def _is_knot(self, searchingElement: str):
         if searchingElement[0] == "(" or searchingElement[-1] == ")":
             return True
         return False
 
+    # удаление узлов ___________________________________________________________________________________________________
     def _delete_nods(self):
         index = 0
         while index < len(self.items):
@@ -54,40 +52,50 @@ class ECircuit_Structuring():
                 index -= 1
             index += 1
 
+    # полчение данных о входах и выходах каждого кейса _________________________________________________________________
     def _get_in_out_of_cases(self):
         result = []
         for row in self.items[1:]:
             if "I==" not in row[0]:
                 break
             outputs = self._get_case_outputs(row[1], [], [])
-            result.append([row[0][3:],row[1], outputs])
+            result.append([row[0][3:], row[1], outputs])
         return result
 
+    # полчение данных о выходах кейса (для _get_in_out_of_cases()) _____________________________________________________
     def _get_case_outputs(self, searchingElement: str, foundItems: list, foundIElements: list):
         for index in range(len(self.items)):  # перебор введенных смежностей
             if searchingElement == self.items[index][0]:  # если нашли такой
                 if "I=" in searchingElement:
-                    if  searchingElement[2:] not in foundIElements:
+                    if searchingElement[2:] not in foundIElements:
                         foundIElements.append(searchingElement[2:])
-                elif index not in foundItems:                   # и если он уже вызывался в ветке
+                elif index not in foundItems:  # и если он уже вызывался в ветке
                     foundItems.append(index)  # помечаем как найденный
                     if self.items[index][-1] == '0':  # проверяем на тип "функциональный"
-                        foundIElements = self._get_case_outputs(self.items[index][1], foundItems.copy(), foundIElements.copy())
+                        foundIElements = self._get_case_outputs(self.items[index][1],
+                                                                foundItems.copy(),
+                                                                foundIElements.copy())
                     else:  # иначе он является предикатным
-                        foundIElements = self._get_case_outputs(self.items[index][1], foundItems.copy(), foundIElements.copy())
-                        foundIElements = self._get_case_outputs(self.items[index][2], foundItems.copy(), foundIElements.copy())
+                        foundIElements = self._get_case_outputs(self.items[index][1],
+                                                                foundItems.copy(),
+                                                                foundIElements.copy())
+                        foundIElements = self._get_case_outputs(self.items[index][2],
+                                                                foundItems.copy(),
+                                                                foundIElements.copy())
                 break
         return foundIElements
 
+    # проверка на то, можно ли подставить кейс или нет _________________________________________________________________
     def _isReplaceable(self, in_out_cases: list, replaceable: list):
         is_such = False
         for item in in_out_cases:
-            if replaceable[0] in item[2]: # если заменяемый элемент хоть раз вызвается в этом кейсе
+            if replaceable[0] in item[2]:  # если заменяемый элемент хоть раз вызвается в этом кейсе
                 is_such = True
                 if item[0] in replaceable[2]:  # если этот элемент рекурсивный то ничего не заменяем и выходим
                     return False
-        return  is_such
+        return is_such
 
+    # удаление кейса и подставление его в нужные места других кейсов ___________________________________________________
     def _updateReplaceable(self, searchingElemnet):
         temp: str = ""
         # поиск строки
@@ -98,16 +106,16 @@ class ECircuit_Structuring():
                 self.items.pop(index)
                 # заменяем ссылку на нее
                 for _index in range(0, len(self.items)):
-                    for i in [1,2]:
+                    for i in [1, 2]:
                         if self.items[_index][i] == "I=={0}".format(searchingElemnet[0]):
                             self.items[_index][i] = temp
                             check = True
                             break
                 break
         # заменяем ссылки I=X
-        isStart = False # для того чтобы I=X что идет после старта не удалялась
+        isStart = False  # для того чтобы I=X что идет после старта не удалялась
         for index in range(0, len(self.items)):
-            for i in [1,2]:
+            for i in [1, 2]:
                 if self.items[index][i] == "I={0}".format(searchingElemnet[0]):
                     if self.items[index][0] != "START":
                         self.items[index][i] = searchingElemnet[1]
@@ -118,8 +126,6 @@ class ECircuit_Structuring():
             if self.items[index][0] == "I={0}".format(searchingElemnet[0]):
                 self.items.pop(index)
                 break
-
-
 
     # задам таблицу смежности из готового списка _______________________________________________________________________
     def setTable(self, newItems):
@@ -133,9 +139,7 @@ class ECircuit_Structuring():
                 self.items.append(row)
         return True
 
-    def getTable(self):
-        return self.items
-
+    # структурирование _________________________________________________________________________________________________
     def build(self):
         # удаление всех узлов
         self._delete_nods()
@@ -155,6 +159,8 @@ class ECircuit_Structuring():
                     isAnalis = True
                     break
 
+    def getTable(self):
+        return self.items
 
 if __name__ == "__main__":
     t0 = "qertyu"
@@ -166,25 +172,25 @@ if __name__ == "__main__":
     print(t1)
 
     sitems = [
-        ['START','A','0'],
-        ['A','C','0'],
-        ['C','D','A'],
-        ['D','A', 'END']
+        ['START', 'A', '0'],
+        ['A', 'C', '0'],
+        ['C', 'D', 'A'],
+        ['D', 'A', 'END']
     ]
 
     items = [
-        ['(1)','I==0','0'],
-        ['I==0','END','I==1'],
-        ['I==1','A','I==2'],
-        ['I==2','B', 'I==3'],
+        ['(1)', 'I==0', '0'],
+        ['I==0', 'END', 'I==1'],
+        ['I==1', 'A', 'I==2'],
+        ['I==2', 'B', 'I==3'],
         ["I==3", "1.1/2", "I==4"],
         ["I==4", "C", "(1)"],
         ["START", "I=1", '0'],
-        ['A','I=2','I=4'],
-        ['B','I=3','I=1'],
+        ['A', 'I=2', 'I=4'],
+        ['B', 'I=3', 'I=1'],
         ['1.1/2', 'I=0', '0'],
         ['C', 'I=0', '0'],
-        ['I=0', '(1)','0'],
+        ['I=0', '(1)', '0'],
         ['I=1', '(1)', '0'],
         ['I=2', '(1)', '0'],
         ['I=3', '(1)', '0'],

@@ -3,6 +3,7 @@ import sys
 from interfaces import activationWindowUI
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QWidget
+from PyQt5.Qt import QIcon
 
 class MiniWidget_signals(QObject):
     dial_changed = pyqtSignal(int)
@@ -17,9 +18,10 @@ class ActivationWindow(QWidget, activationWindowUI.Ui_Form):
         self.initUI()
 
     def initUI(self):
+        self.setWindowIcon(QIcon('./icons/icon.ico'))
         self.window().setWindowTitle("Активация")
         self.set_label_time(self.time_left)
-        self.lineEditKey.setVisible(False)
+        self.widgetKey.setVisible(False)
         self.lineEditKey.setMaxLength(self.key_len)
         self.pushFree.setEnabled(False)
         if self.time_left > 0:
@@ -37,7 +39,7 @@ class ActivationWindow(QWidget, activationWindowUI.Ui_Form):
     @pyqtSlot()
     def on_pushKey_clicked(self):
         self.lineEditKey.clear()
-        self.lineEditKey.setVisible(True)
+        self.widgetKey.setVisible(not self.widgetKey.isVisible())
 
     @pyqtSlot(str)
     def on_lineEditKey_textChanged(self, text):

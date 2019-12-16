@@ -16,7 +16,6 @@ class MyGraphicView(QGraphicsView):
 
     def initUI(self):
         self.setFrameShape(QFrame.NoFrame)
-        #self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setAlignment(QtCore.Qt.AlignCenter)
         # сцена --------------------------------------------------------------------------------------------------------
         self.scene = QGraphicsScene()

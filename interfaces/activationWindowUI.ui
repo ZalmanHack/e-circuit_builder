@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>167</height>
+    <height>146</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,33 +19,82 @@
   <property name="minimumSize">
    <size>
     <width>500</width>
-    <height>167</height>
+    <height>146</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>500</width>
-    <height>167</height>
+    <height>146</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true"/>
+   <string notr="true">background-color: rgb(255, 255, 255);</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QLabel" name="label">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QWidget" name="widgetTime" native="true">
      <property name="styleSheet">
-      <string notr="true">font: 16pt &quot;Segoe UI&quot;;</string>
+      <string notr="true">QWidget {
+font: 25 16pt &quot;Segoe UI&quot;;
+}</string>
      </property>
-     <property name="text">
-      <string>Построитель Е-Схем</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>10</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Пробный период</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_time">
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>0 мин. 0 сек.</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -62,97 +111,224 @@
     </spacer>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="styleSheet">
-        <string notr="true">font: 25 16pt &quot;Segoe UI&quot;;</string>
-       </property>
-       <property name="text">
-        <string>Пробный период</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_time">
-       <property name="styleSheet">
-        <string notr="true">font: 25 16pt &quot;Segoe UI&quot;;</string>
-       </property>
-       <property name="text">
-        <string>0 мин. 0 сек.</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QLineEdit" name="lineEditKey">
+    <widget class="QWidget" name="widgetKey" native="true">
      <property name="styleSheet">
-      <string notr="true">font: 25 16pt &quot;Segoe UI&quot;;</string>
+      <string notr="true">QWidget {
+border-style: solid;
+border-color:  rgb(213, 213, 213)
+}</string>
      </property>
-     <property name="inputMask">
-      <string/>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="maxLength">
-      <number>32767</number>
-     </property>
-     <property name="frame">
-      <bool>true</bool>
-     </property>
-     <property name="echoMode">
-      <enum>QLineEdit::Normal</enum>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="placeholderText">
-      <string>Введите ключ активации</string>
-     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel {
+background-color: rgb(240, 240, 240);
+border-top-width: 1;
+border-left-width: 1;
+border-right-width: 1;
+color: rgb(93, 93, 93);
+padding-left: 10px;
+}</string>
+        </property>
+        <property name="text">
+         <string>Поля для ввода ключа активации</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEditKey">
+        <property name="styleSheet">
+         <string notr="true">QLineEdit {
+	border-top-width: 1;
+	border-bottom-width: 1;
+	border-left-width: 1;
+	border-right-width: 1;
+	font: 25 16pt &quot;Segoe UI&quot;;
+}</string>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="maxLength">
+         <number>32767</number>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+        <property name="echoMode">
+         <enum>QLineEdit::Normal</enum>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="placeholderText">
+         <string>Ключ</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
+    <widget class="QWidget" name="" native="true">
+     <property name="minimumSize">
       <size>
-       <width>20</width>
-       <height>40</height>
+       <width>0</width>
+       <height>20</height>
       </size>
      </property>
-    </spacer>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QPushButton" name="pushFree">
-       <property name="text">
-        <string>Начать пробный период</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushKey">
-       <property name="text">
-        <string>Ввести ключ активации</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushExit">
-       <property name="text">
-        <string>Выход из программы</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QWidget {
+border-style: solid;
+border-color:  rgb(213, 213, 213)
+}</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="pushFree">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+background-color: rgb(240, 240, 240);
+border-top-width: 1;
+border-bottom-width: 1;
+border-left-width: 1;
+color: rgb(93, 93, 93)
+}
+QPushButton:hover {
+background-color: rgb(220, 220, 220);
+color: rgb(0, 0, 0);
+}
+QPushButton:pressed {
+background-color: rgb(93, 93, 93);
+color: rgb(240, 240, 240);
+}</string>
+        </property>
+        <property name="text">
+         <string>Начать пробный период</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushKey">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+background-color: rgb(240, 240, 240);
+border-top-width: 1;
+border-bottom-width: 1;
+border-left-width: 1;
+border-right-width: 1;
+color: rgb(93, 93, 93)
+}
+QPushButton:hover {
+background-color: rgb(220, 220, 220);
+color: rgb(0, 0, 0);
+}
+QPushButton:pressed {
+background-color: rgb(93, 93, 93);
+color: rgb(240, 240, 240);
+}</string>
+        </property>
+        <property name="text">
+         <string>Ввести ключ активации</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushExit">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+background-color: rgb(240, 240, 240);
+border-top-width: 1;
+border-bottom-width: 1;
+border-right-width: 1;
+color: rgb(93, 93, 93)
+}
+QPushButton:hover {
+background-color: rgb(220, 220, 220);
+color: rgb(0, 0, 0);
+}
+QPushButton:pressed {
+background-color: rgb(93, 93, 93);
+color: rgb(240, 240, 240);
+}</string>
+        </property>
+        <property name="text">
+         <string>Выход из программы</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>

@@ -152,6 +152,14 @@ class ECircuit_Build():
         else:
             return False
 
+    def getKnotQuantity(self):
+        self.element_with_knots = []
+        for row in self.items:
+            if self._is_knot(row[0]) and row[0] not in self.element_with_knots:
+                self.element_with_knots.append(row[0])
+        self.knot_quantity = len(self.element_with_knots)
+        return self.knot_quantity
+
     def getItemLen(self):
         return self.itemLen
 
@@ -164,11 +172,13 @@ class ECircuit_Build():
     def setTable(self, newItems): # задам таблицу смежности из готового списка
         self.items = []
         self.matrix = []
+        self.getKnotQuantity()
         self.itemLen = 6
         self.startIsValid = False  # проверка на существование блока старт в таблице (items)
         for item in newItems:
             if self.itemIsValid(item):
                 self.items.append(item)
+        print(self.items)
 
     def getTable(self):
         return self.items
@@ -194,7 +204,7 @@ class ECircuit_Build():
     def build(self, add_knots: bool = True):
         self.matrix = [[""] * len(self.items) * 15 for i in range(len(self.items) * 15)]
         self.element_with_knots = []
-        self.knot_quantity = 0
+        self.getKnotQuantity()
         self.branches = []
         if add_knots:
             self._create_knots("START", [])         # создание узлов

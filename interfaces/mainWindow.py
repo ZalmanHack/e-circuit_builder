@@ -1,10 +1,8 @@
 import sys
-import time
+import pickle
 from functions.ecircuit import ECircuit
 from interfaces import mainWindowUI
 from interfaces.myGraphicsView import MyGraphicView
-from PyQt5.QtWidgets import QApplication, QMainWindow
-from PyQt5.QtCore import *
 from PyQt5.Qt import *
 
 class MainWindow(QMainWindow, mainWindowUI.Ui_MainWindow):
@@ -23,6 +21,7 @@ class MainWindow(QMainWindow, mainWindowUI.Ui_MainWindow):
         self.initECircuit()
 
     def initUI(self):
+        self.setWindowIcon(QIcon('./icons/icon.ico'))
         self.window().setWindowTitle("Построитель Е-Схем")
         # инициализация таблицы ----------------------------------------------------------------------------------------
         self.initModel()
@@ -43,10 +42,13 @@ class MainWindow(QMainWindow, mainWindowUI.Ui_MainWindow):
         self.showECircuit.setChecked(True)
         self.showBranches.setChecked(True)
         self.showTable.setChecked(True)
+        # инициализируем нижний блок -----------------------------------------------------------------------------------
+        self.setBottomInfo()
         # отключения элементов -------------------------- ! ! ! ! ! ! --------------------------------------------------
         # self.pushMinimization.deleteLater()
         # self.pushStructuring.deleteLater()
         # self.pushDestructuring.deleteLater()
+        self.menuInfo.deleteLater()
 
     def initModel(self):
         self.model = QStandardItemModel()
@@ -70,15 +72,12 @@ class MainWindow(QMainWindow, mainWindowUI.Ui_MainWindow):
         self.ec_signals.startMinimize.connect(self.e_circuit.minimize)
         self.ec_signals.startStruct.connect(self.e_circuit.structuring)
         self.e_circuit.built.connect(self.built)  # сообщение от построителя с матрицей и дллиной текста
-        self.e_circuit.minimized.connect(self.minimized)
-        self.e_circuit.structured.connect(self.structured)
         self.e_circuit.error.connect(self.msg_error)
         self.e_circuit.moveToThread(self.e_circuit_thread)
         self.e_circuit_thread.start()
 
     @pyqtSlot(QModelIndex)
     def on_model_dataChanged(self, index: QModelIndex):
-        print(index.row(), index.column())
         for column in range(0, self.model.columnCount()):
             if self.model.index(index.row(),column).data() is None or self.model.index(index.row(),column).data() == '':
                 return
@@ -105,6 +104,7 @@ class MainWindow(QMainWindow, mainWindowUI.Ui_MainWindow):
         self.plainTextEdit.clear()
         self.graphicView.scene.clear()
         self.graphicView.scene.setSceneRect(0, 0, 50, 50)
+        self.setBottomInfo()
 
     @pyqtSlot()
     def on_pushMinimization_triggered(self):
@@ -119,7 +119,7 @@ class MainWindow(QMainWindow, mainWindowUI.Ui_MainWindow):
     @pyqtSlot()
     def on_pushExport_triggered(self):
         file_name = QFileDialog.getSaveFileName(self, "Сохранить файл как", "Схема", "PNG(*.png)")
-        if file_name[0] is not None:
+        if file_name[0] != '':
             image = QImage(self.graphicView.scene.width()*2, self.graphicView.scene.height()*2, QImage.Format_ARGB32_Premultiplied)
             image.fill(QColor(Qt.white))
             painter = QPainter(image)
@@ -127,6 +127,28 @@ class MainWindow(QMainWindow, mainWindowUI.Ui_MainWindow):
             self.graphicView.scene.render(painter)
             painter.end()
             image.save(file_name[0])
+
+    @pyqtSlot()
+    def on_pushSave_triggered(self):
+        file_name = QFileDialog.getSaveFileName(self, "Сохранить файл", "Схема", "ECB(*.ecb)")
+        if file_name[0] != '':
+            with open(file_name[0], 'wb') as file:
+                pickle.dump(self.items, file)
+
+    @pyqtSlot()
+    def on_pushOpen_triggered(self):
+        file_name = QFileDialog.getOpenFileName(self, "Открыть файл", "Схема", "ECB(*.ecb)")
+        if file_name[0] != '':
+            with open(file_name[0], 'rb') as file:
+                info = pickle.load(file)
+                if type(info) == list and len(info) > 0:
+                    self.on_pushClear_triggered()
+                    self.model.setRowCount(0)
+                    for row in info:
+                        self.model.appendRow([QStandardItem(row[0]), QStandardItem(row[1]), QStandardItem(row[2])])
+                        self.items.append([row[0], row[1], row[2]])
+                    self.ec_signals.setTable.emit(self.items)
+                    self.ec_signals.startBuild.emit()
 
     @pyqtSlot()
     def on_showECircuit_triggered(self):
@@ -140,24 +162,25 @@ class MainWindow(QMainWindow, mainWindowUI.Ui_MainWindow):
     def on_showTable_triggered(self):
         self.panelTable.setVisible(self.showTable.isChecked())
 
+    @pyqtSlot()
+    def on_closeTable_clicked(self):
+        self.showTable.setChecked(False)
+        self.on_showTable_triggered()
+
+    @pyqtSlot()
+    def on_closeECircuit_clicked(self):
+        self.showECircuit.setChecked(False)
+        self.on_showECircuit_triggered()
+
+    @pyqtSlot()
+    def on_closeBranches_clicked(self):
+        self.showBranches.setChecked(False)
+        self.on_showBranches_triggered()
+
     @pyqtSlot(QCloseEvent)
     def closeEvent(self, event):
         self.closed.emit()
         return super(MainWindow, self).closeEvent(event)
-
-    @pyqtSlot(list, list, list, int)
-    def minimized(self, branches: list, matrix: list, items: list, textLen: int):
-        self.items = items
-        self.updateGraphisView(matrix, textLen)
-        self.updateTableView(items)
-        self.updateBranchesText(branches)
-
-    @pyqtSlot(list, list, list, int)
-    def structured(self, branches: list, matrix: list, items: list, textLen: int):
-        self.items = items
-        self.updateGraphisView(matrix, textLen)
-        self.updateTableView(items)
-        self.updateBranchesText(branches)
 
     @pyqtSlot(str)
     def msg_error(self, text):
@@ -167,10 +190,26 @@ class MainWindow(QMainWindow, mainWindowUI.Ui_MainWindow):
         msg.setWindowTitle("Сообщение")
         msg.exec_()
 
-    @pyqtSlot(list, list, int)
-    def built(self,  branches: list, matrix: list, textLen: int):
+    @pyqtSlot(list, list, list, int, int)
+    def built(self, branches: list, matrix: list, items: list, textLen: int, quantityKnots: int):
+        if items:
+            self.items = items
+            self.updateTableView(items)
+        # считаем кол-во элементов
+        elements = []
+        for row in self.items:
+            if row[0] != "START" and row[0] not in elements:
+                elements.append(row[0])
+        # отображаем данные
         self.updateGraphisView(matrix, textLen)
         self.updateBranchesText(branches)
+        self.setBottomInfo(len(branches), len(elements), quantityKnots)
+
+    def setBottomInfo(self, branches: int = 0, quantityElements: int = 0, quantityKnots: int = 0):
+        self.labelBranches.setText("Ветви: {0}".format(branches))
+        self.labelElements.setText("Элементы: {0}".format(quantityElements))
+        self.labelKnots.setText("Узлы: {0}".format(quantityKnots))
+        self.labelEmty.setText("Данные взяты из таблицы смежности")
 
     @pyqtSlot(list)
     def updateBranchesText(self, branches: list):

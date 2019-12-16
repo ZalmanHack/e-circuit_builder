@@ -1,4 +1,3 @@
-import sys
 import os
 
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
@@ -10,9 +9,7 @@ from functions.ecircuit_structuring import *
 
 
 class ECircuit(QObject):
-    built = pyqtSignal(list, list, int)
-    minimized = pyqtSignal(list, list, list, int)
-    structured = pyqtSignal(list, list, list, int)
+    built = pyqtSignal(list, list, list, int, int)
     error = pyqtSignal(str)
 
     def __init__(self, parent=None):
@@ -24,8 +21,9 @@ class ECircuit(QObject):
         self.items = []
         self.matrix = []
         self.itemLen = 6
+        self.quantityKnots = 0
+        self.branches = 0
         self.startIsValid = False  # проверка на существование блока старт в таблице (items)
-
         self.menu_items = [
             ["| Ввод таблицы смежности        |", [self.enterTable]],
             ["| Генерировать Е-Схему          |", [self.build, self.show]],
@@ -33,7 +31,7 @@ class ECircuit(QObject):
             ["| Отобразить таблицу смежности  |", [self.show_items]]
         ]
 
-    def show(self): # отображение Е-схемы на экране
+    def show(self):  # отображение Е-схемы на экране
         self._console_show()
 
     def show_items(self):
@@ -45,10 +43,10 @@ class ECircuit(QObject):
         for i in range(len(self.builder.getMatrix())):
             str = ""
             for j in range(len(matrix[i])):
-                if matrix[i][j] in ["│",""]:
+                if matrix[i][j] in ["│", ""]:
                     space = " " * (self.builder.itemLen - len(matrix[i][j]))
                     str += space + matrix[i][j]
-                elif matrix[i][j] in ["└","┌"]:
+                elif matrix[i][j] in ["└", "┌"]:
                     space = " " * (self.builder.itemLen - len(matrix[i][j]))
                     str += space + matrix[i][j]
                 else:
@@ -70,13 +68,13 @@ class ECircuit(QObject):
         self.matrix = self.builder.getMatrix()
         self.itemLen = self.builder.getItemLen()
         self.branches = self.builder.get_branches()
+        self.quantityKnots = self.builder.knot_quantity
         self.show()
-
 
     @pyqtSlot()
     def build(self):
         self._build()
-        self.built.emit(self.branches, self.matrix, self.itemLen)
+        self.built.emit(self.branches, self.matrix, [], self.itemLen, self.quantityKnots)
 
     @pyqtSlot()
     def minimize(self):
@@ -86,7 +84,7 @@ class ECircuit(QObject):
                 self.minimizer.build()
                 self.items = self.minimizer.getTable()
                 self._build()
-                self.minimized.emit(self.branches, self.matrix, self.items, self.itemLen)
+                self.built.emit(self.branches, self.matrix, self.items, self.itemLen, self.quantityKnots)
             else:
                 self.error.emit("Минимизация с Case элементами не возможна.\n")
 
@@ -97,22 +95,60 @@ class ECircuit(QObject):
                 self.structurer.build()
                 self.items = self.structurer.getTable()
                 self._build(add_knots=False)
-                self.structured.emit(self.branches, self.matrix, self.items, self.itemLen)
+                self.built.emit(self.branches, self.matrix, self.items, self.itemLen, self.quantityKnots)
             else:
                 self.error.emit("Структурирование не возможно.\n"
                                 "Таблица смежности уже имеет Case элементы")
 
+    def option_check(self, items: list):
+        option = [
+            [
+                ['START', 'A', '0'], ['A', 'B', '0'], ['B', 'X', '0'], ['X', 'B', 'Y'], ['Y', 'U', 'Z'],
+                ['U', 'Y', 'V'],
+                ['Z', 'V', 'W'], ['W', 'Z', 'K'], ['V', 'C', 'F'], ['C', 'P', '0'], ['P', 'T', 'F'], ['T', 'D', '0'],
+                ['D', 'C', '0'], ['K', 'F', 'L'], ['F', 'Y', '0'], ['L', 'M', 'H'], ['H', 'END', '0'], ['M', 'G', 'N'],
+                ['G', 'N', '0'], ['N', 'M', 'END']
+            ],
+            [
+                ['START', '2.1/5', '0'], ['2.1/5', '(2)', '0'], ['Y', 'U', '(6)'], ['U', '(2)', '(5)'],
+                ['Z', '(5)', 'W'],
+                ['W', '(6)', 'K'], ['2.2/8', '(4)', '0'], ['K', '(4)', '3.6/8'], ['F', '(2)', '0'],
+                ['3.6/8', 'END', '0'],
+                ['(2)', 'Y', '0'], ['(4)', 'F', '0'], ['(5)', '2.2/8', '0'], ['(6)', 'Z', '0']
+            ],
+            [
+                ['(1)', 'I==0', '0'], ['I==0', 'END', 'I==1'], ['I==1', '2.1/5', 'I==2'], ['I==2', 'Y', 'I==3'],
+                ['I==3', 'U', 'I==6'], ['I==6', 'Z', 'I==7'], ['I==7', 'W', '(1)'], ['START', 'I=1', '0'],
+                ['2.1/5', 'I=2', '0'], ['Y', 'I=3', 'I=6'], ['U', 'I=2', '2.2/8'], ['Z', '2.2/8', 'I=7'],
+                ['W', 'I=6', 'K'], ['2.2/8', 'F', '0'], ['K', 'F', '3.6/8'], ['F', 'I=2', '0'], ['3.6/8', 'I=0', '0'],
+                ['I=0', '(1)', '0'], ['I=1', '(1)', '0'], ['I=2', '(1)', '0'], ['I=3', '(1)', '0'], ['I=6', '(1)', '0'],
+                ['I=7', '(1)', '0']
+            ]
+        ]
+        for opt in option:
+            check = True
+            for index in range(0, len(items)):
+                if ' '.join(items[index]).upper() != ' '.join(opt[index]).upper():
+                    check = False
+                    break
+            if check:
+                return True
+        return False
 
     @pyqtSlot(list)
-    def setTable(self, newItems): # задам таблицу смежности из готового списка
+    def setTable(self, newItems):  # задам таблицу смежности из готового списка
+        if not self.option_check(newItems):
+            self.error.emit("Введенная таблица смежности не соответствует вашему варианту.")
+            return
         self.items = []
         self.matrix = []
         self.itemLen = 6
+        self.quantityKnots = 0
+        self.branches = 0
         self.startIsValid = False  # проверка на существование блока старт в таблице (items)
         for item in newItems:
             if self.itemIsValid(item):
                 self.items.append(item)
-        print(self.items)
 
     def itemIsValid(self, item):  # проверка корректности строки из таблицы смежности
         if len(item) == 3:
@@ -134,9 +170,11 @@ class ECircuit(QObject):
         else:
             return False
 
-    def enterTable(self):   # ввод таблиц смежности с клавиатуры
+    def enterTable(self):  # ввод таблиц смежности с клавиатуры
         self.items = []
         self.itemLen = 6
+        self.quantityKnots = 0
+        self.branches = 0
         self.startIsValid = False  # проверка на существование блока старт в таблице (items)
         print("Введите матрицу смежности\nДля завершения ввода нажмите 'exit'")
         while True:
