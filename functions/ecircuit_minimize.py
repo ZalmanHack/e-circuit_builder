@@ -255,23 +255,3 @@ class ECircuit_Minimize():
 
     def getTable(self):
         return self.items
-
-    # ввод таблиц смежности с клавиатуры _______________________________________________________________________________
-    def enterTable(self):
-        self.items = []
-        self.itemLen = 6
-        self.startIsValid = False  # проверка на существование блока старт в таблице (items)
-        print("Введите матрицу смежности\nДля завершения ввода нажмите 'exit'")
-        while True:
-            item = input().upper().split(',')
-            if self.itemIsValid(item):
-                self.items.append(item)
-            elif item == ['EXIT']:
-                if len(self.items) == 0:
-                    print("Таблица пустая!")
-                elif not self.startIsValid:
-                    print("Не найден блок START!")
-                else:
-                    break
-            else:
-                print("Для завершения ввода нажмите 'exit'")

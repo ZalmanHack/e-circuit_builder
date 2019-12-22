@@ -242,6 +242,7 @@ class MainWindow(QMainWindow, mainWindowUI.Ui_MainWindow):
         else:
             self.graphicView.scene.clear()
 
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()

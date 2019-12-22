@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>910</width>
-    <height>571</height>
+    <width>897</width>
+    <height>569</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,6 +17,70 @@
    <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true">QWidget {
+	border-style: solid;
+	border-color:  rgb(213, 213, 213);
+}
+QScrollBar {
+	border-style: solid;
+	border-color:  rgb(213, 213, 213);
+	background:white;
+	margin: 0px 0px 0px 0px;
+}
+
+QScrollBar:vertical {
+	border-left-width: 1px;
+}
+QScrollBar:horizontal {
+	border-top-width: 1px;
+}
+
+QScrollBar::handle {        
+	border-style: solid; 
+	border-color:  rgb(213, 213, 213);
+	background-color: rgb(240, 240, 240);
+}
+
+QScrollBar::handle:vertical {        
+	border-top-width: 1px;
+	border-bottom-width: 1px;
+}
+QScrollBar::handle:horizontal {        
+	border-left-width: 1px;
+	border-right-width: 1px;
+}
+
+QScrollBar::sub-line:vertical {
+	height: 0;
+    subcontrol-position: top;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::add-line:vertical {       
+	height: 0;
+    subcontrol-position: bottom;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:horizontal {
+	height: 0;
+    subcontrol-position: right;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::add-line:horizontal {       
+	height: 0;
+    subcontrol-position: left;
+    subcontrol-origin: margin;
+}
+
+
+
+
+
+</string>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout_5">
     <property name="spacing">
      <number>0</number>
@@ -65,10 +129,7 @@
          <item>
           <widget class="QWidget" name="panelECircuit" native="true">
            <property name="styleSheet">
-            <string notr="true">QWidget {
-border-style: solid;
-border-color:  rgb(213, 213, 213)
-}</string>
+            <string notr="true"/>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <property name="spacing">
@@ -87,7 +148,7 @@ border-color:  rgb(213, 213, 213)
              <number>0</number>
             </property>
             <item>
-             <widget class="QWidget" name="" native="true">
+             <widget class="QWidget" name="widget" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -220,10 +281,7 @@ color: rgb(240, 240, 240);
          <item>
           <widget class="QWidget" name="panelBranches" native="true">
            <property name="styleSheet">
-            <string notr="true">QWidget {
-border-style: solid;
-border-color:  rgb(213, 213, 213)
-}</string>
+            <string notr="true"/>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
             <property name="spacing">
@@ -242,7 +300,7 @@ border-color:  rgb(213, 213, 213)
              <number>0</number>
             </property>
             <item>
-             <widget class="QWidget" name="" native="true">
+             <widget class="QWidget" name="widget" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -399,9 +457,8 @@ color: rgb(240, 240, 240);
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">QWidget {
-border-style: solid;
-border-color:  rgb(213, 213, 213);
+         <string notr="true">QScrollBar:vertical {
+	border-left-width: 0;
 }</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -421,7 +478,7 @@ border-color:  rgb(213, 213, 213);
           <number>0</number>
          </property>
          <item>
-          <widget class="QWidget" name="" native="true">
+          <widget class="QWidget" name="widget" native="true">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -581,28 +638,42 @@ color: rgb(240, 240, 240);
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="spacing">
-       <number>0</number>
+     <widget class="QWidget" name="widgetBotton" native="true">
+      <property name="styleSheet">
+       <string notr="true"/>
       </property>
-      <item>
-       <widget class="QLabel" name="labelBranches">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel {
-border-style: solid;
-border-color:  rgb(213, 213, 213);
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="labelBranches">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QLabel {
 background-color: rgb(240, 240, 240);
 border-top-width: 1px;
 border-right-width: 1px;
@@ -610,30 +681,28 @@ color: rgb(93, 93, 93);
 padding-left: 10px;
 padding-right: 10px;
 }</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="labelElements">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel {
-border-style: solid;
-border-color:  rgb(213, 213, 213);
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelElements">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QLabel {
 background-color: rgb(240, 240, 240);
 border-top-width: 1px;
 border-right-width: 1px;
@@ -641,30 +710,28 @@ color: rgb(93, 93, 93);
 padding-left: 10px;
 padding-right: 10px;
 }</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="labelKnots">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel {
-border-style: solid;
-border-color:  rgb(213, 213, 213);
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelKnots">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QLabel {
 background-color: rgb(240, 240, 240);
 border-top-width: 1px;
 border-right-width: 1px;
@@ -672,43 +739,42 @@ color: rgb(93, 93, 93);
 padding-left: 10px;
 padding-right: 10px;
 }</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="labelEmty">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel {
-border-style: solid;
-border-color:  rgb(213, 213, 213);
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelEmty">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QLabel {
 background-color: rgb(240, 240, 240);
 border-top-width: 1;
 color: rgb(93, 93, 93);
 padding-left: 10px;
 padding-right: 10px;
 }</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-     </layout>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -717,7 +783,7 @@ padding-right: 10px;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>910</width>
+     <width>897</width>
      <height>21</height>
     </rect>
    </property>

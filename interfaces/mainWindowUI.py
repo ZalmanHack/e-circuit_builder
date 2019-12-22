@@ -13,9 +13,71 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(910, 571)
+        MainWindow.resize(897, 569)
         MainWindow.setStyleSheet("")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setStyleSheet("QWidget {\n"
+"    border-style: solid;\n"
+"    border-color:  rgb(213, 213, 213);\n"
+"}\n"
+"QScrollBar {\n"
+"    border-style: solid;\n"
+"    border-color:  rgb(213, 213, 213);\n"
+"    background:white;\n"
+"    margin: 0px 0px 0px 0px;\n"
+"}\n"
+"\n"
+"QScrollBar:vertical {\n"
+"    border-left-width: 1px;\n"
+"}\n"
+"QScrollBar:horizontal {\n"
+"    border-top-width: 1px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle {        \n"
+"    border-style: solid; \n"
+"    border-color:  rgb(213, 213, 213);\n"
+"    background-color: rgb(240, 240, 240);\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical {        \n"
+"    border-top-width: 1px;\n"
+"    border-bottom-width: 1px;\n"
+"}\n"
+"QScrollBar::handle:horizontal {        \n"
+"    border-left-width: 1px;\n"
+"    border-right-width: 1px;\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:vertical {\n"
+"    height: 0;\n"
+"    subcontrol-position: top;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical {       \n"
+"    height: 0;\n"
+"    subcontrol-position: bottom;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::sub-line:horizontal {\n"
+"    height: 0;\n"
+"    subcontrol-position: right;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line:horizontal {       \n"
+"    height: 0;\n"
+"    subcontrol-position: left;\n"
+"    subcontrol-origin: margin;\n"
+"}\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"")
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout_5.setContentsMargins(0, 0, 0, 0)
@@ -36,10 +98,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.setSpacing(0)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
         self.panelECircuit = QtWidgets.QWidget(self.mainWidget)
-        self.panelECircuit.setStyleSheet("QWidget {\n"
-"border-style: solid;\n"
-"border-color:  rgb(213, 213, 213)\n"
-"}")
+        self.panelECircuit.setStyleSheet("")
         self.panelECircuit.setObjectName("panelECircuit")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.panelECircuit)
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -110,10 +169,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addLayout(self.gridLayout)
         self.verticalLayout_4.addWidget(self.panelECircuit)
         self.panelBranches = QtWidgets.QWidget(self.mainWidget)
-        self.panelBranches.setStyleSheet("QWidget {\n"
-"border-style: solid;\n"
-"border-color:  rgb(213, 213, 213)\n"
-"}")
+        self.panelBranches.setStyleSheet("")
         self.panelBranches.setObjectName("panelBranches")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.panelBranches)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -200,9 +256,8 @@ class Ui_MainWindow(object):
         self.panelTable.setSizePolicy(sizePolicy)
         self.panelTable.setMinimumSize(QtCore.QSize(300, 0))
         self.panelTable.setMaximumSize(QtCore.QSize(300, 16777215))
-        self.panelTable.setStyleSheet("QWidget {\n"
-"border-style: solid;\n"
-"border-color:  rgb(213, 213, 213);\n"
+        self.panelTable.setStyleSheet("QScrollBar:vertical {\n"
+"    border-left-width: 0;\n"
 "}")
         self.panelTable.setObjectName("panelTable")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.panelTable)
@@ -286,10 +341,14 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.addWidget(self.tableView)
         self.horizontalLayout_5.addWidget(self.panelTable)
         self.verticalLayout_5.addLayout(self.horizontalLayout_5)
-        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.widgetBotton = QtWidgets.QWidget(self.centralwidget)
+        self.widgetBotton.setStyleSheet("")
+        self.widgetBotton.setObjectName("widgetBotton")
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.widgetBotton)
+        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.labelBranches = QtWidgets.QLabel(self.centralwidget)
+        self.labelBranches = QtWidgets.QLabel(self.widgetBotton)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -297,8 +356,6 @@ class Ui_MainWindow(object):
         self.labelBranches.setSizePolicy(sizePolicy)
         self.labelBranches.setMinimumSize(QtCore.QSize(0, 20))
         self.labelBranches.setStyleSheet("QLabel {\n"
-"border-style: solid;\n"
-"border-color:  rgb(213, 213, 213);\n"
 "background-color: rgb(240, 240, 240);\n"
 "border-top-width: 1px;\n"
 "border-right-width: 1px;\n"
@@ -309,7 +366,7 @@ class Ui_MainWindow(object):
         self.labelBranches.setText("")
         self.labelBranches.setObjectName("labelBranches")
         self.horizontalLayout.addWidget(self.labelBranches)
-        self.labelElements = QtWidgets.QLabel(self.centralwidget)
+        self.labelElements = QtWidgets.QLabel(self.widgetBotton)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -317,8 +374,6 @@ class Ui_MainWindow(object):
         self.labelElements.setSizePolicy(sizePolicy)
         self.labelElements.setMinimumSize(QtCore.QSize(0, 20))
         self.labelElements.setStyleSheet("QLabel {\n"
-"border-style: solid;\n"
-"border-color:  rgb(213, 213, 213);\n"
 "background-color: rgb(240, 240, 240);\n"
 "border-top-width: 1px;\n"
 "border-right-width: 1px;\n"
@@ -329,7 +384,7 @@ class Ui_MainWindow(object):
         self.labelElements.setText("")
         self.labelElements.setObjectName("labelElements")
         self.horizontalLayout.addWidget(self.labelElements)
-        self.labelKnots = QtWidgets.QLabel(self.centralwidget)
+        self.labelKnots = QtWidgets.QLabel(self.widgetBotton)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -337,8 +392,6 @@ class Ui_MainWindow(object):
         self.labelKnots.setSizePolicy(sizePolicy)
         self.labelKnots.setMinimumSize(QtCore.QSize(0, 20))
         self.labelKnots.setStyleSheet("QLabel {\n"
-"border-style: solid;\n"
-"border-color:  rgb(213, 213, 213);\n"
 "background-color: rgb(240, 240, 240);\n"
 "border-top-width: 1px;\n"
 "border-right-width: 1px;\n"
@@ -349,7 +402,7 @@ class Ui_MainWindow(object):
         self.labelKnots.setText("")
         self.labelKnots.setObjectName("labelKnots")
         self.horizontalLayout.addWidget(self.labelKnots)
-        self.labelEmty = QtWidgets.QLabel(self.centralwidget)
+        self.labelEmty = QtWidgets.QLabel(self.widgetBotton)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -357,8 +410,6 @@ class Ui_MainWindow(object):
         self.labelEmty.setSizePolicy(sizePolicy)
         self.labelEmty.setMinimumSize(QtCore.QSize(0, 20))
         self.labelEmty.setStyleSheet("QLabel {\n"
-"border-style: solid;\n"
-"border-color:  rgb(213, 213, 213);\n"
 "background-color: rgb(240, 240, 240);\n"
 "border-top-width: 1;\n"
 "color: rgb(93, 93, 93);\n"
@@ -368,10 +419,10 @@ class Ui_MainWindow(object):
         self.labelEmty.setText("")
         self.labelEmty.setObjectName("labelEmty")
         self.horizontalLayout.addWidget(self.labelEmty)
-        self.verticalLayout_5.addLayout(self.horizontalLayout)
+        self.verticalLayout_5.addWidget(self.widgetBotton)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 910, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 897, 21))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")

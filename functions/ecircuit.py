@@ -1,12 +1,8 @@
-import os
-
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
 from functions.ecircuit_bould import *
-from functions.ecircuit_draw import *
 from functions.ecircuit_minimize import *
 from functions.ecircuit_structuring import *
-
 
 class ECircuit(QObject):
     built = pyqtSignal(list, list, list, int, int)
@@ -24,42 +20,6 @@ class ECircuit(QObject):
         self.quantityKnots = 0
         self.branches = 0
         self.startIsValid = False  # проверка на существование блока старт в таблице (items)
-        self.menu_items = [
-            ["| Ввод таблицы смежности        |", [self.enterTable]],
-            ["| Генерировать Е-Схему          |", [self.build, self.show]],
-            ["| Минимизировать Е-Схему        |", [self.build, self.minimize, self.build, self.show]],
-            ["| Отобразить таблицу смежности  |", [self.show_items]]
-        ]
-
-    def show(self):  # отображение Е-схемы на экране
-        self._console_show()
-
-    def show_items(self):
-        for item in self.items:
-            print(",".join(item))
-
-    def _console_show(self):
-        matrix = self.builder.getMatrix()
-        for i in range(len(self.builder.getMatrix())):
-            str = ""
-            for j in range(len(matrix[i])):
-                if matrix[i][j] in ["│", ""]:
-                    space = " " * (self.builder.itemLen - len(matrix[i][j]))
-                    str += space + matrix[i][j]
-                elif matrix[i][j] in ["└", "┌"]:
-                    space = " " * (self.builder.itemLen - len(matrix[i][j]))
-                    str += space + matrix[i][j]
-                else:
-                    space = "─" * (self.builder.itemLen - len(matrix[i][j]))
-                    str += space + matrix[i][j]
-            print(str)
-
-    def _graphic_show(self):
-        painter = ECircuit_Draw()
-        painter.setMatrix(self.builder.getMatrix())
-        painter.setTextSetting(self.builder.getItemLen(), 8)
-        painter.draw()
-        del painter
 
     def _build(self, add_knots: bool = True):
         self.builder.setTable(self.items)
@@ -69,7 +29,6 @@ class ECircuit(QObject):
         self.itemLen = self.builder.getItemLen()
         self.branches = self.builder.get_branches()
         self.quantityKnots = self.builder.knot_quantity
-        self.show()
 
     @pyqtSlot()
     def build(self):
@@ -101,6 +60,7 @@ class ECircuit(QObject):
                                 "Таблица смежности уже имеет Case элементы")
 
     def option_check(self, items: list):
+        return True
         option = [
             [
                 ['START', 'A', '0'], ['A', 'X', '0'], ['X', 'C', 'B'], ['C', 'Y', '0'], ['Y', 'D', 'Z'],
@@ -165,46 +125,3 @@ class ECircuit(QObject):
                 return True
         else:
             return False
-
-    def enterTable(self):  # ввод таблиц смежности с клавиатуры
-        self.items = []
-        self.itemLen = 6
-        self.quantityKnots = 0
-        self.branches = 0
-        self.startIsValid = False  # проверка на существование блока старт в таблице (items)
-        print("Введите матрицу смежности\nДля завершения ввода нажмите 'exit'")
-        while True:
-            item = input().upper().split(',')
-            if self.itemIsValid(item):
-                self.items.append(item)
-            elif item == ['EXIT']:
-                if len(self.items) == 0:
-                    print("Таблица пустая!")
-                elif not self.startIsValid:
-                    print("Не найден блок START!")
-                else:
-                    break
-            else:
-                print("Для завершения ввода нажмите 'exit'")
-        os.system('cls')
-
-    def start(self):
-        os.system('cls')
-        while True:
-            try:
-                size = 0
-                for item in self.menu_items:
-                    size += 1
-                    print("{0} {1}".format(size, item[0]))
-                cin = input("Выберите пункт меню >> ")
-                os.system('cls')
-                if int(cin) in range(0, size + 1):
-                    for foo in self.menu_items[int(cin) - 1][1]:
-                        foo()
-            except Exception as e:
-                continue
-
-
-if __name__ == "__main__":
-    test = ECircuit()
-    test.start()
